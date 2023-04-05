@@ -1,2 +1,24 @@
-# Tienda-de-Productos
-Proyecto Final para la materia de Desarrollo de Software 3
+# tienda_final
+
+## Project setup
+```
+yarn install
+```
+
+### Compiles and hot-reloads for development
+```
+yarn serve
+```
+
+### Compiles and minifies for production
+```
+yarn build
+```
+
+### Lints and fixes files
+```
+yarn lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
