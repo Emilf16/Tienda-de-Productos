@@ -22,19 +22,34 @@
               <v-card-text>
                 <v-form v-if="tab === 0" ref="loginForm" v-model="valid">
 
-                  <v-text-field label="Correo electrónico" name="email" type="email" v-model="email" :rules="emailRules"
-                    required></v-text-field>
-                  <v-text-field label="Contraseña" name="password" type="password" v-model="password"
-                    :rules="passwordRules" required></v-text-field>
+                  <v-text-field autocomplete="off" label="Correo electrónico" name="email" type="email" v-model="email"
+                    :rules="emailRules" required
+                    v-bind:class="{ 'form-control': true, 'is-invalid': !validEmail(email) }"></v-text-field>
+
+
+                  <v-text-field autocomplete="off" label="Contraseña" name="password" type="password" v-model="password"
+                    :rules="passwordRules" required
+                    v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }"></v-text-field>
+
+
                 </v-form>
+
                 <v-form v-else ref="registerForm" v-model="valid">
-                  <v-text-field label="Nombre" name="name" v-model="name" :rules="nameRules" required></v-text-field>
-                  <v-text-field label="Correo electrónico" name="email" type="email" v-model="email" :rules="emailRules"
+
+                  <v-text-field autocomplete="off" label="Nombre" name="name" v-model="name" :rules="nameRules"
                     required></v-text-field>
-                  <v-text-field label="Contraseña" name="password" type="password" v-model="password"
-                    :rules="passwordRules" required></v-text-field>
-                  <v-text-field label="Confirmar contraseña" name="confirmPassword" type="password"
-                    v-model="confirmPassword" :rules="confirmPasswordRules" required></v-text-field>
+
+                  <v-text-field autocomplete="off" label="Correo electrónico" name="email" type="email" v-model="email"
+                    :rules="emailRules" required
+                    v-bind:class="{ 'form-control': true, 'is-invalid': !validEmail(email) }"></v-text-field>
+
+                  <v-text-field autocomplete="off" label="Contraseña" name="password" type="password" v-model="password"
+                    :rules="passwordRules" required
+                    v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }"></v-text-field>
+
+                  <v-text-field autocomplete="off" label="Confirmar contraseña" name="confirmPassword" type="password"
+                    v-model="confirmPassword" :rules="confirmPasswordRules" required
+                    v-bind:class="{ 'form-control': true, 'is-invalid': !validConfirmPassword(confirmPassword) }"></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
@@ -42,6 +57,7 @@
                   {{ tab === 0 ? 'Iniciar sesión' : 'Registrar' }}
                 </v-btn>
               </v-card-actions>
+
             </v-card>
           </v-col>
         </v-row>
@@ -90,29 +106,59 @@ export default {
     };
   },
   methods: {
-    onLoginSuccess() {
-      this.isLoggedIn = true;
-    },
-    submitForm() {
-      if (this.$refs.loginForm.validate()) {
-        // this.$refs.loginForm.validate().then((valid) => {
-        //   if (valid) {
-        //     this.onLoginSuccess();
-        //     // Handle login submit
-        //   }
-        // }
-        // );
 
-        console.log('hola')
-        this.onLoginSuccess();
-      } else {
-        this.$refs.registerForm.validate().then((valid) => {
-          if (valid) {
-            console.log("no")
-            // this.onLoginSuccess();
-          }
-        });
+    validate() {
+      this.emailBlured = true;
+      this.passwordBlured = true;
+      if (this.validEmail(this.email) && this.validPassword(this.password) && this.validConfirmPassword(this.confirmPassword) && this.validName(this.name)) {
+
+        this.valid = true;
       }
+    },
+    validEmail(email) {
+      var re = /(.+)@(.+){2,}\.(.+){2,}/;
+      if (re.test(email.toLowerCase())) {
+
+        return true;
+      }
+    },
+
+
+    validConfirmPassword(confirmPassword) {
+      if (confirmPassword.length > 7 && confirmPassword == this.password) {
+        return true;
+      }
+    },
+    validPassword(password) {
+      if (password.length > 7) {
+        return true;
+      }
+    },
+    validName(name) {
+      if (name.length > 3) {
+        return true;
+      }
+    },
+
+    submitForm() {
+
+      if (this.tab === 0) {
+
+        this.validate();
+        if (this.valid) {
+          this.isLoggedIn = true;
+        }
+
+      } else {
+
+        this.validate();
+        if (this.valid) {
+          this.isLoggedIn = true;
+        }
+        // Handle login submit
+
+      }
+
     },
   },
 };
