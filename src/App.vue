@@ -1,17 +1,12 @@
- 
- 
-
-
 <template>
   <v-app>
     <v-main>
-      <v-layout fluid v-if="isLoggedIn">
-        <PantallaTienda>
-        </PantallaTienda>
-      </v-layout>
+      <!-- <v-layout fluid v-if="isLoggedIn"> -->
+      <PantallaTienda>
+      </PantallaTienda>
+      <!-- </v-layout> -->
 
-
-      <v-container fluid class="fill-height" v-else>
+      <!-- <v-container fluid class="fill-height" v-else>
         <v-row align="center" justify="center">
           <v-col cols="12" md="8" class="login-form">
             <v-card>
@@ -61,7 +56,7 @@
             </v-card>
           </v-col>
         </v-row>
-      </v-container>
+      </v-container> -->
     </v-main>
   </v-app>
 </template>

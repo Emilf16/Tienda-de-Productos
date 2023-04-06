@@ -2,8 +2,10 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import PantallaProductos from '../components/PantallaProductos.vue'
 import CarritoCompras from '../components/CarritoCompras.vue'
 import PagarProducto from '../components/PagarProducto.vue'
+import GestionarStock from '../components/GestionarStock.vue'
 
 const routes = [
+
 
   {
     path: '/pantallaProductos',
@@ -16,6 +18,10 @@ const routes = [
   {
     path: '/pagarProducto',
     component: PagarProducto
+  },
+  {
+    path: '/gestionarStock',
+    component: GestionarStock
   }
 
 ]

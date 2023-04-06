@@ -18,10 +18,17 @@
 
             <v-divider></v-divider>
             <v-list density="compact" nav>
+                <!-- buscar productos -->
                 <router-link to="/pantallaProductos" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-view-dashboard" title="Productos" value="productos"></v-list-item></router-link>
+                <!-- ver carrito -->
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-cart-outline" title="Carrito" value="carrito"></v-list-item></router-link>
+                <!-- gestionar productos -->
+                <router-link to="/gestionarStock" style="text-decoration: none; color: inherit;"><v-list-item
+                        prepend-icon="mdi-cart-arrow-down" title="Gestionar Stock"
+                        value="carrito"></v-list-item></router-link>
+
             </v-list>
         </v-navigation-drawer>
 
@@ -33,12 +40,12 @@
                 </div>
 
                 <div class="pt-0">
-                    Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum.
-                    Praesent
-                    ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit
-                    amet
-                    dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel
-                    ipsum
+                    Bienvenidos a nuestra tienda de productos, donde encontrarás una amplia selección de artículos de alta
+                    calidad para satisfacer todas tus necesidades. Desde tecnología innovadora hasta productos de belleza y
+                    bienestar, tenemos todo lo que necesitas para mejorar tu estilo de vida y disfrutar de una experiencia
+                    de compra inolvidable. Nuestro compromiso es ofrecerte los mejores productos al mejor precio, y nuestro
+                    equipo de expertos está siempre dispuesto a ayudarte a encontrar exactamente lo que estás buscando.
+                    Gracias por visitarnos y esperamos verte pronto en nuestra tienda.
                 </div>
 
                 <v-divider></v-divider>
