@@ -55,6 +55,7 @@
             <v-col cols="12" lg="4" md="6">
                 <v-card-title>
                     <h2 class="headline">Resumen de compra</h2>
+                    
                 </v-card-title>
                 <v-card elevation="4">
                     <v-card-text>
