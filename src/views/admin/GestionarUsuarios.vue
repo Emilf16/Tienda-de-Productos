@@ -1,136 +1,113 @@
-
 <template>
-    <v-container>
+    <v-container fluid>
+        <v-table fixed-header height="300px">
+            <thead>
+                <tr>
+                    <th class="text-left" v-for="header in headers">
+                        {{ header.text }}
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(usuario, index)  in listaUsuarios" v-bind:key="index" v-bind:usuario="usuario">
+                    <td>{{ usuario.idUsuario }}</td>
+                    <td>{{ usuario.NombreUsuario }}</td>
+                    <td>{{ usuario.Nombres }}</td>
+                    <td>{{ usuario.Apellidos }}</td>
+                    <td>{{ usuario.CorreoElectronico }}</td>
+                    <td>{{ usuario.Perfil }}</td>
+                    <td>
+                        <v-row>
+                            <v-btn @click="getUser">hola</v-btn>
+                            <div style="width: 5px;">
+                            </div>
+                            <v-btn></v-btn>
+                        </v-row>
+
+                    </td>
+                </tr>
+            </tbody>
+        </v-table>
+
 
     </v-container>
 </template>
   
 <script>
+import axios from 'axios'
 export default {
     data: () => ({
         dialog: false,
         headers: [
-            {
-                text: 'Dessert (100g serving)',
-                align: 'start',
-                sortable: false,
-                value: 'name',
-            },
-            { text: 'Calories', value: 'calories' },
-            { text: 'Fat (g)', value: 'fat' },
-            { text: 'Carbs (g)', value: 'carbs' },
-            { text: 'Protein (g)', value: 'protein' },
-            { text: 'Actions', value: 'actions', sortable: false },
+            { text: 'ID', value: 'id' },
+            { text: 'Usuario', value: 'usuario' },
+            { text: 'Nombre', value: 'nombre' },
+            { text: 'Apellido', value: 'apellido' },
+            { text: 'Correo electrónico', value: 'email' },
+            { text: 'Perfil', value: 'perfil' },
+            { text: 'Acciones', value: 'acciones' },
         ],
-        desserts: [],
-        editedIndex: -1,
-        editedItem: {
-            name: '',
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0,
-        },
-        defaultItem: {
-            name: '',
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0,
-        },
+        listaUsuarios: [
+            {
+                idUsuario: 1,
+                NombreUsuario: "Emil@2314",
+                CorreoElectronico: "Emil@mail.com",
+                Password: "1234512345",
+                PasswordHash: "QEA=sdsdsdsdsdsds",
+                idPerfil: 2,
+                Perfil: "Cliente",
+                idEstado: 7,
+                Estado: "Activo",
+                FechaRegistro: "2023-04-07T17:29:45.8845929-07:00",
+                UltimoIngreso: "2023-04-07T17:29:45.8845929-07:00",
+                Nombres: "Emil Francisco",
+                Apellidos: "Solano Gil",
+                Telefono: "8095555555"
+            },
+            {
+                idUsuario: 2,
+                NombreUsuario: "Divanny@1223",
+                CorreoElectronico: "Divanny@mail.com",
+                Password: "1234512345",
+                PasswordHash: "QEA=sdsdsdsdsdsds",
+                idPerfil: 1,
+                Perfil: "Admin",
+                idEstado: 7,
+                Estado: "Activo",
+                FechaRegistro: "2023-04-07T17:29:45.8845929-07:00",
+                UltimoIngreso: "2023-04-07T17:29:45.8845929-07:00",
+                Nombres: "Divanny",
+                Apellidos: "Perez Mendez",
+                Telefono: "8094444444"
+            }
+        ]
+
     }),
 
-    computed: {
-        formTitle() {
-            return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-        },
-    },
 
-    watch: {
-        dialog(val) {
-            val || this.close()
-        },
-    },
-
-    created() {
-        this.initialize()
-    },
 
     methods: {
-        initialize() {
-            this.desserts = [
-                {
-                    name: 'Frozen Yogurt',
-                    calories: 159,
-                    fat: 6.0,
-                    carbs: 24,
-                    protein: 4.0,
-                },
-                {
-                    name: 'Ice cream sandwich',
-                    calories: 237,
-                    fat: 9.0,
-                    carbs: 37,
-                    protein: 4.3,
-                },
-                {
-                    name: 'Eclair',
-                    calories: 262,
-                    fat: 16.0,
-                    carbs: 23,
-                    protein: 6.0,
-                },
-                {
-                    name: 'Cupcake',
-                    calories: 305,
-                    fat: 3.7,
-                    carbs: 67,
-                    protein: 4.3,
-                },
-                {
-                    name: 'Gingerbread',
-                    calories: 356,
-                    fat: 16.0,
-                    carbs: 49,
-                    protein: 3.9,
-                },
-                {
-                    name: 'Jelly bean',
-                    calories: 375,
-                    fat: 0.0,
-                    carbs: 94,
-                    protein: 0.0,
-                },
-                {
-                    name: 'Lollipop',
-                    calories: 392,
-                    fat: 0.2,
-                    carbs: 98,
-                    protein: 0,
-                },
-                {
-                    name: 'Honeycomb',
-                    calories: 408,
-                    fat: 3.2,
-                    carbs: 87,
-                    protein: 6.5,
-                },
-                {
-                    name: 'Donut',
-                    calories: 452,
-                    fat: 25.0,
-                    carbs: 51,
-                    protein: 4.9,
-                },
-                {
-                    name: 'KitKat',
-                    calories: 518,
-                    fat: 26.0,
-                    carbs: 65,
-                    protein: 7,
-                },
-            ]
+        async getUser() {
+            this.error = null;
+            try {
+                const respuesta = await axios.get('https://tiendabackend.azurewebsites.net/api/Account/GetUserData');
+                console.log(respuesta);
+                if (respuesta.length > 0) {
+                    this.$store.commit('LogOut', true)
+                    this.estaLogueado
+                    console.log(respuesta)
+                }
+            } catch (error) {
+                console.log(error);
+                if (error.response.status === 401) {
+                    console.log('Error desconocido:', error.message);
+                } else {
+                    console.log('Error desconocido:', error);
+                }
+            }
         },
+
 
         editItem(item) {
             this.editedIndex = this.desserts.indexOf(item)
@@ -162,4 +139,4 @@ export default {
     },
 }
 </script>
-
+ 

@@ -5,12 +5,16 @@ import PagarProducto from '../components/PagarProducto.vue'
 import GestionarStock from '../views/admin/GestionarStock.vue'
 import GestionarUsuarios from '../views/admin/GestionarUsuarios.vue'
 import GestionarRoles from '../views/admin/GestionarRoles.vue'
+import PantallaLogin from '../views/PantallaLogin.vue'
 
 const routes = [
 
-
   {
-    path: '/pantallaProductos',
+    path: '/pantallaLogin',
+    component: PantallaLogin
+  },
+  {
+    path: '/',
     component: PantallaProductos
   },
   {
