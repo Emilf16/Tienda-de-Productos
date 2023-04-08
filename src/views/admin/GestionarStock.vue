@@ -12,7 +12,7 @@
 
       <v-col v-for="(product, index) in products" v-bind:key="index" v-bind:product="product" class="pa-0 mb-3" cols="12"
         lg="3" md="4" sm="6" xs="12">
-        <v-card color="#ffffff" theme="light" elevation="4">
+        <v-card class="mx-auto my-2" color="#ffffff" theme="light" elevation="4" max-width="450px">
           <v-avatar class="ma-4"
             size="180
                                                                                                                                                   "
@@ -49,7 +49,7 @@
 
     <v-dialog v-model="dialog" max-width="900px">
       <v-card>
-        <v-card-title>
+        <v-card-title style="margin-top: 20px; margin-left: 24px;">
           <span class="text-h5">{{ formTitle }}</span>
         </v-card-title>
 
