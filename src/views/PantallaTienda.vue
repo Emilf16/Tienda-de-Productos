@@ -16,6 +16,8 @@
             </v-btn>
             <v-btn @click="logOut">LogOut</v-btn>
             <span class="ml-5"></span>
+            <v-btn @click="get">verData</v-btn>
+            <span class="ml-5"></span>
 
         </v-app-bar>
         <v-navigation-drawer v-model="drawer" temporary>
@@ -86,17 +88,43 @@ export default {
         };
     },
     methods: {
-        async logOut() {
-            this.error = null;
-            await axios.put('https://tiendabackend.azurewebsites.net/api/Account',
-                {})
-                .then(respuesta => {
-                    console.log(respuesta);
 
-                    this.$store.commit('LogOut', false)
-                    // this.$router.push({ path: '/' })
-                })
+        async logOut() {
+            try {
+
+                // Hacer la solicitud PUT con el token de autorización en los encabezados
+                const token = localStorage.getItem('token');
+                const response = await axios.put('https://tiendabackend.azurewebsites.net/api/Account', {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                // Borrar el token de autorización del almacenamiento local
+                localStorage.removeItem('token');
+                console.log(response);
+
+                this.$store.commit('LogOut', false);
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
         },
+        async get() {
+            try {
+                const url = 'https://tiendabackend.azurewebsites.net/api/Account';
+                const token = localStorage.getItem('token');
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+
+                console.log('Success:', response.data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
 
 
