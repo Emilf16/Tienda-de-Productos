@@ -8,19 +8,25 @@ import Image from 'primevue/image';
 import { createApp } from 'vue'
 import { createStore } from 'vuex'
 import { jsPDF } from "jspdf";
+import ConfirmPopup from 'primevue/confirmpopup';
+import ConfirmationService from 'primevue/confirmationservice';
 
 loadFonts()
 
 const store = createStore({
   state() {
     return {
-      productosCarrito: []
+      productosCarrito: [],
+      estaLogueado: false
     }
   },
   mutations: {
 
     agregarNuevoProducto(state, producto) {
       state.productosCarrito.push(producto)
+    },
+    LogOut(state, bool) {
+      state.estaLogueado = bool;
     }
   }
 })
