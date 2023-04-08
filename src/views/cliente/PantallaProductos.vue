@@ -64,8 +64,6 @@ import axios from 'axios'
 
 export default {
 
-    components: {
-    },
     data() {
         return {
             checkoutModal: false,
@@ -104,10 +102,6 @@ export default {
             if (this.search) {
                 axios.get('https://www.themealdb.com/api/json/v1/1/search.php?s=' + this.search)
                     .then((res) => {
-                        //idMeal
-                        //strArea
-                        //strCategory
-                        //strSource
                         this.meals = res.data.meals;
 
 

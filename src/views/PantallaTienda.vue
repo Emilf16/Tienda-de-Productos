@@ -4,13 +4,18 @@
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
             <router-link to="/pantallaProductos"
                 style="text-decoration: none; color: inherit;"><v-toolbar-title>Tienda</v-toolbar-title></router-link>
-            <v-spacer></v-spacer>
+            <v-spacer> </v-spacer>
             <v-btn>
 
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;">
-                    <v-icon size="large" icon="mdi-cart-outline" @click="drawer = !drawer"></v-icon>
-                    Carrito</router-link>
+                    <v-badge :content="0" floating>
+                        Carrito <v-icon size="large" icon="mdi-cart-outline"></v-icon></v-badge>
+                </router-link>
+
+
             </v-btn>
+            <v-btn @click="logOut">LogOut</v-btn>
+            <span class="ml-5"></span>
 
         </v-app-bar>
         <v-navigation-drawer v-model="drawer" temporary>
@@ -19,7 +24,7 @@
             <v-divider></v-divider>
             <v-list density="compact" nav>
                 <!-- buscar productos -->
-                <router-link to="/pantallaProductos" style="text-decoration: none; color: inherit;"><v-list-item
+                <router-link to="/" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-view-dashboard" title="Productos" value="productos"></v-list-item></router-link>
                 <!-- ver carrito -->
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;"><v-list-item
@@ -68,12 +73,9 @@
 </template>
 
 <script>
-// import LoginForm from "./components/LoginRegistroUsuario.vue";
+import axios from 'axios'
 
 export default {
-    components: {
-        // LoginForm,
-    },
     data() {
         return {
 
@@ -84,6 +86,19 @@ export default {
         };
     },
     methods: {
+        async logOut() {
+            this.error = null;
+            await axios.put('https://tiendabackend.azurewebsites.net/api/Account',
+                {})
+                .then(respuesta => {
+                    console.log(respuesta);
+
+                    this.$store.commit('LogOut', false)
+                    // this.$router.push({ path: '/' })
+                })
+        },
+
+
 
     },
 };
