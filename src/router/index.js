@@ -1,8 +1,10 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import PantallaProductos from '../components/PantallaProductos.vue'
-import CarritoCompras from '../components/CarritoCompras.vue'
+import PantallaProductos from '../views/cliente/PantallaProductos.vue'
+import CarritoCompras from '../views/cliente/CarritoCompras.vue'
 import PagarProducto from '../components/PagarProducto.vue'
-import GestionarStock from '../components/GestionarStock.vue'
+import GestionarStock from '../views/admin/GestionarStock.vue'
+import GestionarUsuarios from '../views/admin/GestionarUsuarios.vue'
+import GestionarRoles from '../views/admin/GestionarRoles.vue'
 
 const routes = [
 
@@ -22,6 +24,14 @@ const routes = [
   {
     path: '/gestionarStock',
     component: GestionarStock
+  }
+  , {
+    path: '/gestionarUsuarios',
+    component: GestionarUsuarios
+  }
+  , {
+    path: '/gestionarRoles',
+    component: GestionarRoles
   }
 
 ]
