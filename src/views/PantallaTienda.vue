@@ -29,6 +29,14 @@
                         prepend-icon="mdi-cart-arrow-down" title="Gestionar Stock"
                         value="carrito"></v-list-item></router-link>
 
+                <!-- gestionar Usuario -->
+                <router-link to="/gestionarUsuarios" style="text-decoration: none; color: inherit;"><v-list-item
+                        prepend-icon="mdi-account-edit" title="Gestionar Usuarios"
+                        value="carrito"></v-list-item></router-link>
+                <!-- gestionar Roles -->
+                <router-link to="/gestionarRoles" style="text-decoration: none; color: inherit;"><v-list-item
+                        prepend-icon="mdi-account-key" title="Gestionar Roles" value="carrito"></v-list-item></router-link>
+
             </v-list>
         </v-navigation-drawer>
 
