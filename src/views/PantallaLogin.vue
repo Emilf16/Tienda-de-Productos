@@ -1,7 +1,7 @@
 <template>
-    <v-container fluid class="fill-height">
+    <v-container fluid class="fill-height form-container">
         <v-col align="center" justify="center">
-            <v-col cols="12" md="8" class="login-form">
+            <v-col cols="12" md="8" sm="12" lg="6" class="login-form">
                 <v-card>
                     <v-tabs v-model="tab">
                         <v-tab>Inicio de sesión</v-tab>
@@ -9,14 +9,18 @@
                     </v-tabs>
                     <v-card-text>
                         <v-form v-if="tab === 0" ref="loginForm" v-model="valid">
-                            <v-text-field autocomplete="off" label="Nombre" name="name" v-model="name" :rules="nameRules"
+                            <v-text-field autocomplete="off" label="Nombre de usuario" name="name" v-model="name" :rules="nameRules"
                                 required
                                 v-bind:class="{ 'form-control': true, 'is-invalid': !validName(name) }"></v-text-field>
 
 
                             <v-text-field autocomplete="off" label="Contraseña" name="password" type="password"
                                 v-model="password" :rules="passwordRules" required
-                                v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }"></v-text-field>
+                                v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }">
+                            </v-text-field>
+                            <div class="w-100 d-flex flex-row-reverse bd-highlight">
+                                <a class="forgot-password-link">¿Has olvidado la contraseña?</a>
+                            </div>
                         </v-form>
 
                         <v-form v-else ref="registerForm" v-model="valid">
@@ -37,8 +41,8 @@
                                 v-bind:class="{ 'form-control': true, 'is-invalid': !validConfirmPassword(confirmPassword) }"></v-text-field>
                         </v-form>
                     </v-card-text>
-                    <v-card-actions>
-                        <v-btn color="blue" @click="submitForm" variant="flat">
+                    <v-card-actions class="mx-auto">
+                        <v-btn color="warning" @click="submitForm" variant="flat" :disabled="loading" class="mx-auto">
                             {{ tab === 0 ? 'Iniciar sesión' : 'Registrar' }}
                         </v-btn>
                     </v-card-actions>
@@ -50,10 +54,20 @@
 </template>
 
 <style>
-body {
-    background-color: gray;
-}
+    .form-container {
+        background: linear-gradient(to bottom, #090c29, #2b2d42) !important; 
+        height: 100% !important;
+    }
+    .forgot-password-link {
+        text-align: right;
+    }
+    .forgot-password-link:hover {
+        text-align: right;
+        cursor: pointer;
+        color: --warning;
+    }
 </style>
+
 
 <script>
 import { useToast } from "vue-toastification";
@@ -78,6 +92,7 @@ export default {
             password: "",
             name: "",
             confirmPassword: "",
+            loading: false,
             emailRules: [
                 (v) => !!v || "El correo electrónico es requerido",
                 (v) => /.+@.+\..+/.test(v) || "El correo electrónico debe ser válido",
@@ -118,8 +133,9 @@ export default {
                 const response = await axios.post(url, data);
                 // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
                 if (response.data.Success) {
+                    this.loading = false;
                     localStorage.setItem('token', response.data.Token);
-                    this.$store.commit('LogOut', true);
+                    this.$store.commit('mostrarTienda', response.data.Token);
                     this.estaLogueado;
 
                     this.toast.success(response.data.Message, {
@@ -137,6 +153,7 @@ export default {
                     });
                 }
                 else {
+                    this.loading = false;
                     this.toast.warning(response.data.Message, {
                         timeout: 3000,
                         closeOnClick: true,
@@ -166,8 +183,9 @@ export default {
                 const response = await axios.post(url, data);
                 // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
                 if (response.data.Success) {
+                    this.loading = false;
                     localStorage.setItem('token', response.data.Token);
-                    this.$store.commit('LogOut', true);
+                    this.$store.commit('mostrarTienda', response.data.Token);
                     this.estaLogueado;
 
                     this.toast.success(response.data.Message, {
@@ -185,6 +203,7 @@ export default {
                     });
                 }
                 else {
+                    this.loading = false;
                     this.toast.warning(response.data.Message, {
                         timeout: 3000,
                         closeOnClick: true,
@@ -234,6 +253,7 @@ export default {
             }
         },
         submitForm() {
+            this.loading = true;
 
             if (this.tab === 0) {
 
@@ -248,7 +268,6 @@ export default {
                 if (this.valid) {
                     this.registrar();
                 }
-
             }
 
         },

@@ -4,14 +4,11 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import PrimeVue from 'primevue/config';
-import Image from 'primevue/image';
 import { createApp } from 'vue'
 import { createStore } from 'vuex'
 import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import DataTable from 'primevue/datatable';
-import Toolbar from 'primevue/toolbar';
 import { FilterMatchMode } from 'primevue/api';
 
 
@@ -23,7 +20,8 @@ const store = createStore({
   state() {
     return {
       productosCarrito: [],
-      estaLogueado: false
+      estaLogueado: false,
+      userName: "",
     }
   },
   mutations: {
@@ -31,8 +29,13 @@ const store = createStore({
     agregarNuevoProducto(state, producto) {
       state.productosCarrito.push(producto)
     },
-    LogOut(state, bool) {
-      state.estaLogueado = bool;
+    mostrarTienda(state, token) {
+      if (token == null) {
+        state.estaLogueado = false;
+      }
+      else {
+        state.estaLogueado = true;
+      }
     }
   }
 })

@@ -1,12 +1,12 @@
 <template>
   <v-app>
     <v-main>
-      <v-layout fluid v-if="estaLogueado">
+      <v-layout fluid v-if="mostrarTienda">
         <PantallaTienda>
         </PantallaTienda>
       </v-layout>
 
-      <v-layout fluid v-else>
+      <v-layout fluid v-else class="h-100">
         <PantallaLogin>
         </PantallaLogin>
       </v-layout>
@@ -16,8 +16,13 @@
   </v-app>
 </template>
 
+<style>
+  * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+</style>
+
 <script>
-import axios from 'axios'
 import PantallaTienda from './views/PantallaTienda.vue'
 import PantallaLogin from './views/PantallaLogin.vue'
 export default {
@@ -26,6 +31,11 @@ export default {
     PantallaTienda
   },
   computed: {
+    mostrarTienda() {
+      const token = localStorage.getItem('token');
+      this.$store.commit('mostrarTienda', token);
+      return this.$store.state.estaLogueado
+    },
     estaLogueado() {
       return this.$store.state.estaLogueado
     },

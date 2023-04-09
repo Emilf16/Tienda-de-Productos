@@ -1,24 +1,43 @@
 <template>
     <v-app id="inspire">
-        <v-app-bar>
+        <v-app-bar style="background-color: #090C29; color: white">
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
             <router-link to="/pantallaProductos"
                 style="text-decoration: none; color: inherit;"><v-toolbar-title>Tienda</v-toolbar-title></router-link>
             <v-spacer> </v-spacer>
-            <v-btn>
-
+            <v-btn class="mx-3">
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;">
                     <v-badge :content="0" floating>
-                        Carrito <v-icon size="large" icon="mdi-cart-outline"></v-icon></v-badge>
+                        <div class="d-flex align-center">
+                        <span>Carrito</span>
+                        <v-icon size="large" class="ml-2" icon="mdi-cart-outline"></v-icon>
+                        </div>
+                    </v-badge>
                 </router-link>
-
-
             </v-btn>
-            <v-btn @click="logOut">LogOut</v-btn>
-            <span class="ml-5"></span>
-            <v-btn @click="get">verData</v-btn>
-            <span class="ml-5"></span>
+            <v-divider vertical></v-divider>
+            <v-menu class="mx-3" open-on-hover>
+                <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="mx-3">
+                        <v-avatar size="x-small" class="mr-2" image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"></v-avatar>
+                        <span>Username</span>
+                        <v-icon>mdi-chevron-down</v-icon>
+                    </v-btn>
+                </template>
 
+                <v-list class="text-center">
+                    <v-list-item>
+                        <v-btn  variant="text">Mi perfil</v-btn>
+                    </v-list-item>
+                    <v-list-item>
+                        <v-btn  variant="text">Mis ordenes</v-btn>
+                    </v-list-item>
+                    <v-divider></v-divider>
+                    <v-list-item>
+                        <v-btn  variant="text" @click="logOut">Cerrar sesión</v-btn>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
         </v-app-bar>
         <v-navigation-drawer v-model="drawer" temporary>
             <v-divider></v-divider>
@@ -47,30 +66,36 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-main>
-            <router-view />
-            <v-footer class="bg-indigo-lighten-1 text-center d-flex flex-column">
-                <div>
-                    <v-btn v-for="icon in icons" :key="icon" class="mx-4" :icon="icon" variant="text"></v-btn>
-                </div>
-
-                <div class="pt-0">
-                    Bienvenidos a nuestra tienda de productos, donde encontrarás una amplia selección de artículos de alta
-                    calidad para satisfacer todas tus necesidades. Desde tecnología innovadora hasta productos de belleza y
-                    bienestar, tenemos todo lo que necesitas para mejorar tu estilo de vida y disfrutar de una experiencia
-                    de compra inolvidable. Nuestro compromiso es ofrecerte los mejores productos al mejor precio, y nuestro
-                    equipo de expertos está siempre dispuesto a ayudarte a encontrar exactamente lo que estás buscando.
-                    Gracias por visitarnos y esperamos verte pronto en nuestra tienda.
-                </div>
-
-                <v-divider></v-divider>
-
-                <div>
-                    {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
-                </div>
-            </v-footer>
+        <v-main style="background-color: white;">
+            <router-view/>
         </v-main>
         <!---->
+        <v-footer color="#090C29" class="white--text">
+            <v-container>
+            <v-row style="color: white">
+                <v-col cols="12" md="4">
+                <h3 class="mb-4">Sobre nosotros</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut tellus eget neque tincidunt semper. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce eget sapien tincidunt, maximus eros ac, cursus ante.</p>
+                </v-col>
+                <v-col cols="12" md="4">
+                <h3 class="mb-4">Contáctanos</h3>
+                <p>Teléfono: 123-456-7890</p>
+                <p>Email: info@mi-tienda.com</p>
+                <p>Dirección: 123 Main St, Ciudad, Estado ZIP</p>
+                </v-col>
+                <v-col cols="12" md="4">
+                <h3 class="mb-4">Síguenos en redes sociales</h3>
+                <v-row>
+                    <v-col cols="4" md="3" v-for="icon in socialIcons" :key="icon">
+                    <v-btn color="#fff" depressed class="rounded-lg" :href="'https://' + icon.link" target="_blank">
+                        <v-icon size="28">{{ icon.icon }}</v-icon>
+                    </v-btn>
+                    </v-col>
+                </v-row>
+                </v-col>
+            </v-row>
+            </v-container>
+        </v-footer>
     </v-app>
 </template>
 
@@ -85,6 +110,12 @@ export default {
             rail: true,
             reveal: false,
             categories: [],
+            socialIcons: [
+                { icon: 'mdi-facebook', link: 'www.facebook.com/mitienda' },
+                { icon: 'mdi-twitter', link: 'www.twitter.com/mitienda' },
+                { icon: 'mdi-instagram', link: 'www.instagram.com/mitienda' },
+                { icon: 'mdi-pinterest', link: 'www.pinterest.com/mitienda' },
+            ],
         };
     },
     methods: {
@@ -103,7 +134,7 @@ export default {
                 localStorage.removeItem('token');
                 console.log(response);
 
-                this.$store.commit('LogOut', false);
+                this.$store.commit('mostrarTienda', null);
 
             } catch (error) {
                 console.error('Error:', error);
