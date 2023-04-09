@@ -50,9 +50,9 @@
 </template>
 
 <style>
-    body {
-        background-color: gray;
-    }
+body {
+    background-color: gray;
+}
 </style>
 
 <script>
@@ -61,8 +61,8 @@ import { useToast } from "vue-toastification";
 import axios from 'axios'
 export default {
     setup() {
-      const toast = useToast();
-      return { toast }
+        const toast = useToast();
+        return { toast }
     },
 
     computed: {
@@ -105,12 +105,12 @@ export default {
     methods: {
         async registrar() {
 
-            const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
+            const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios/Registrar';
             const data = {
                 NombreUsuario: this.name,
                 CorreoElectronico: this.email,
                 Password: this.password,
-                idPerfil: 1,
+                idPerfil: 2,
                 idEstado: 1,
                 Nombres: this.name,
             };
@@ -123,32 +123,32 @@ export default {
                     this.estaLogueado;
 
                     this.toast.success(response.data.Message, {
-                    timeout: 3000,
-                    closeOnClick: true,
-                    pauseOnFocusLoss: false,
-                    pauseOnHover: false,
-                    draggable: true,
-                    draggablePercent: 0.6,
-                    showCloseButtonOnHover: true,
-                    hideProgressBar: true,
-                    closeButton: "button",
-                    icon: true,
-                    rtl: false
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
                     });
                 }
                 else {
                     this.toast.warning(response.data.Message, {
-                    timeout: 3000,
-                    closeOnClick: true,
-                    pauseOnFocusLoss: false,
-                    pauseOnHover: false,
-                    draggable: true,
-                    draggablePercent: 0.6,
-                    showCloseButtonOnHover: true,
-                    hideProgressBar: true,
-                    closeButton: "button",
-                    icon: true,
-                    rtl: false
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
                     });
                 }
             } catch (error) {
@@ -171,32 +171,32 @@ export default {
                     this.estaLogueado;
 
                     this.toast.success(response.data.Message, {
-                    timeout: 3000,
-                    closeOnClick: true,
-                    pauseOnFocusLoss: false,
-                    pauseOnHover: false,
-                    draggable: true,
-                    draggablePercent: 0.6,
-                    showCloseButtonOnHover: true,
-                    hideProgressBar: true,
-                    closeButton: "button",
-                    icon: true,
-                    rtl: false
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
                     });
                 }
                 else {
                     this.toast.warning(response.data.Message, {
-                    timeout: 3000,
-                    closeOnClick: true,
-                    pauseOnFocusLoss: false,
-                    pauseOnHover: false,
-                    draggable: true,
-                    draggablePercent: 0.6,
-                    showCloseButtonOnHover: true,
-                    hideProgressBar: true,
-                    closeButton: "button",
-                    icon: true,
-                    rtl: false
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
                     });
                 }
             } catch (error) {
