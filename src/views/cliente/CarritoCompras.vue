@@ -3,62 +3,75 @@
         <v-row>
             <v-col cols="12" lg="8" md="6" sm="12" xs="12">
                 <v-card-title>
-                    <div class="d-flex justify-space-between align-center">
-    <h1 class="ml-15 mb-4 mt-5">Artículos del Carrito</h1>
-    </div>
+                    <div class="d-flex">
+  <h1 class="ml-5 mb-15 mt-5" style="left: 600px; top: -25px;">Artículos del Carrito</h1>
+</div>
+<div class="ml-4" style="position: relative;">
+    <div class="d-flex justify-space-between align-center">
+  <span style="position: absolute; left: 0; top: -25px; bottom: 5; margin-left: 2%; margin-bottom: 10px; width: 20%;">Producto</span>
+  <span style="position: absolute; left: 0; top: -25px; bottom: 5; margin-bottom: 10px; width: 55%; text-align: right; padding-right: -30%;">Precio</span>
+  <span style="position: absolute; left: 0; top: -25px; bottom: 5; margin-bottom: 10px; width: 72%; text-align: right; padding-right: -30%;">Cantidad</span>
+  <span style="position: absolute; left: 0; top: -25px; bottom: 5; margin-bottom: 10px; width: 85%; text-align: right; padding-right: -30%;">Total</span>
+</div>
+  <hr class="mt-5" style="position: relative; bottom: -9px; left: 0; right: 0; border-top: 1px solid grey;">
+</div>
+
+
+
+
 </v-card-title>
 
                 <v-col v-for="(producto, index) in productosCarrito" v-bind:key="index" v-bind:producto="producto"
-                    class="ml-15">
-                    <v-card color="#ffffff" theme="light" elevation="1" class="ml-1">
+                    class="ml-5">
+                    <v-card color="#ffffff" theme="light" elevation="0" class="ml-0">
                         <div class="d-flex flex-no-wrap">
-                            <v-avatar class="ma-4" size="120" rounded="0" cols="6" lg="6" md="6" sm="6" xs="6">
+                            <v-avatar class="mb-5" size="120" rounded="0" cols="9" lg="6" md="6" sm="6" xs="6">
                                 <v-img v-bind:src="producto.strCategoryThumb" v-bind:alt="producto.strCategory"></v-img>
                             </v-avatar>
                             <div>
                                 <v-col>
-                                    <v-card-title class="text-h5">
-                                        {{ producto.strCategory }}
-                                    </v-card-title>
-                                    <v-card-text>
+                                    <v-card-title class="text-h6 mt-2">
+  {{ producto.strCategory }}
+</v-card-title>
+<v-card-text>
+  <v-row class="mx-0 my-4">
+    <div style="position: absolute; left: 0; top: 47px; bottom: 3; margin-bottom: 7px; width: 53%; text-align: right; padding-right: -30%;">
+      <span style="font-size: large;" class="text-black">$ {{ producto.precio }}</span>
+    </div>
+    <div style="position: absolute; left: 0; top: 47px; bottom: 3; margin-bottom: 1px; width: 66%; text-align: right; padding-right: -30%;">
+      <span style="font-size: large;" class="text-black mt-1">{{ producto.count }}</span>
+    </div>
 
-                                        <v-row align="center" class="mx-0 my-6">
-                                        <span style="  font-weight: bold; font-size: large;" class="text-black">
-                                            RD${{ producto.precio }}
-                                        </span>
-                                        </v-row>
-                                        <v-row align="center" class="mx-0 my-0">
-                                            <span style=" font-size: large;" class="text-black mt-1">
-                                            Cantidad: {{ producto.count }}
-                                        </span>
-                                        </v-row>
-                                    </v-card-text>
-                                    <v-card-actions>
-                                        <v-btn color="#008f39" variant="flat" class="flex-grow-4 ml-2"
+    <div style="position: absolute; left: 0; top: 32px; bottom: 5; margin-bottom: 10px; width: 100%; text-align: right; padding-right: -30%;">
+        <v-btn @click="removeItem(index)" icon elevation="0" hover-size="0">
+  <v-icon left color="#252525">mdi-delete</v-icon>
+</v-btn>
+</div>
+<div style="position: absolute; left: 0; top: 32px; bottom: 5; margin-bottom: 10px; width: 95%; text-align: right; padding-right: -30%;">
+        <v-btn icon elevation="0" hover-size="0"
                             @click="agregarNuevoProducto(producto)">
-                            <span style="color: white; font-weight: bold;">
-                                + Agregar
+                            <span style="color: #252525; font-weight: bold;">
+                                +
                             </span>
                         </v-btn>
-  <v-btn color="#BE1D1D" variant="flat" text @click="removeItem(index)">
-    <v-icon left color="#FFFFFF">mdi-delete</v-icon>
-    <span style="color: white; font-weight: bold;"></span>
-  </v-btn>
-</v-card-actions>
-
+</div>
+  </v-row>
+</v-card-text>
                                 </v-col>
+                               
                             </div>
+                            
                         </div>
                     </v-card>
+                    <hr class="mt-2" style="border-top: 1px solid grey; width: 98%;">
                 </v-col>
 
             </v-col>
             <v-col cols="12" lg="4" md="6">
-                <v-btn color="#F7BB44" @click="clearCart" class="mt-6 ml-300 mb-15">
-        <v-icon left color="#FFFFFF">mdi-window-close</v-icon>
-    <span style="color: white; font-weight: bold;"></span>
-</v-btn>
-                    <v-sheet color="#F0F0F0" elevation="0" class="pa-6 ml-15">
+                <v-btn color="#F7BB44" @click="clearCart" style="margin-top: 10%; margin-left: 61%; margin-bottom: 9%;">
+                    <span style="font-weight: bold; color: white;">Vacear Carro</span>
+                </v-btn>
+                    <v-sheet color="#F0FCFF" elevation="0" class="pa-6 " style="margin-left: 6%; margin-right: 4%;">
                    <v-card-title class="align-center">
                     
                     <h2 class="align-center mt-20px mb-5">Resumen</h2>
@@ -89,60 +102,66 @@
             </v-col>
         </v-row>
         
-        <!-- ver producto -->
-        <v-dialog v-model="verProducto">
-            <v-card>
-                <v-card-title>Procesar pago</v-card-title>
-                <v-card-text>
-                    <v-form ref="form" v-model="valid">
-                        <v-text-field label="Nombre en la tarjeta" v-model="cardHolderName" :rules="nameRules"
-                            required></v-text-field>
-                        <v-text-field label="Número de tarjeta" v-model="cardNumber" :rules="numberRules"
-                            required></v-text-field>
-                        <v-text-field label="Fecha de expiración (MM/YY)" v-model="expirationDate" :rules="dateRules"
-                            required></v-text-field>
-                        <v-text-field label="CVV" v-model="cvv" :rules="cvvRules" required></v-text-field>
-                    </v-form>
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn color="primary" @click="checkout">
-                        Procesar pago
-                    </v-btn>
-                    <v-btn @click="cerrarProductoModal">Cancelar</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
         <!-- pagar productos -->
-        <v-dialog v-model="checkoutModal">
-            <v-card>
-                <v-card-title>Procesar pago</v-card-title>
-                <v-card-text>
-                    <v-form ref="form" v-model="valid">
-                        <v-text-field label="Nombre en la tarjeta" v-model="cardHolderName" :rules="nameRules"
-                            required></v-text-field>
-                        <v-text-field label="Número de tarjeta" v-model="cardNumber" :rules="numberRules"
-                            required></v-text-field>
-                        <v-text-field label="Fecha de expiración (MM/YY)" v-model="expirationDate" :rules="dateRules"
-                            required></v-text-field>
-                        <v-text-field label="CVV" v-model="cvv" :rules="cvvRules" required></v-text-field>
-                    </v-form>
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn color="primary" @click="checkout">
-                        Procesar pago
-                    </v-btn>
-                    <v-btn @click="closeCheckout">Cancelar</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <v-dialog v-model="checkoutModal" max-width="550">
+  <v-card color="#ffffff" theme="light" elevation="0">
+    <v-card-text>
+      <div class="container d-flex flex-column align-center justify-center">
+        <div class="card" style="font-family:'Poppins', sans-serif; height: 260px; width: 350px;">
+          <div class="top">
+            <h3 class="mb-7 mt-5" style="margin-left: 100px;">Agregar Tarjeta</h3>
+            <hr>
+          </div>
+          <div class="card-details mt-6">
+  <span style="margin-right: 17%;">Número</span>
+  <input type="text" placeholder="0000 0000 0000 0000" data-slots="0" data-accept="\d" size="19" style="padding-left: 5px; margin-left: 3%;" maxlength="16">
+  <i class="fa fa-credit-card"></i>
+</div>
+
+          <div class="exp-cvv">
+            <div class="card-details mt-4">
+              <span style="margin-right: 17%;;">Fecha</span>
+              <input type="text" placeholder="MM/YYYY" data-slots="my" size="5" maxlength="3" style="padding-left: 5px; margin-left: 8%;">
+              
+              <i class="fa fa-calendar"></i>
+            </div>
+            <div class="card-details mt-4">
+  <span style="margin-right: 17%;">CVV</span>
+  <input type="text" placeholder="000" data-slots="my" data-accept="\d" size="7" style="padding-left: 5px; margin-left: 13%;" maxlength="3">
+  <i class="fa fa-info-circle"></i>
+</div>
+
+          </div>
+          <div class="card-details mt-4 mb-5">
+            <span style="margin-right: 17%; margin-top: 10px;">Nombre</span>
+            <input type="text" placeholder="Nombre en tarjeta" style="padding-left: 5px; margin-left: 4%;">            
+          </div>
+        </div>
+      </div>
+    </v-card-text>
+    <v-card-actions style="margin-top: -10px;">
+          <v-spacer></v-spacer>
+          <v-btn class="mb-5" color="#BE1D1D" variant="flat" style="margin-left: 20px;" @click="closeCheckout">
+            <span style="color:white; font-weight: bold;">
+              Cancelar
+            </span>
+          </v-btn>
+          <v-btn class="mb-5" color="#008F39" variant="flat" style="margin-left: 160px;" @click="checkout">
+            <span style="color:white; font-weight: bold;">
+              Confirmar
+            </span>
+          </v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+  </v-card>
+</v-dialog>
     </v-container>
 </template>
 
 <script>
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas';
-
+import VueCreditCardValidation from 'vue-credit-card-validation';
 export default {
     // props: ['productosCarrito'],
 
@@ -334,7 +353,9 @@ export default {
             return {
             productosCarrito: []
             }
-            
+            const Example ={ 
+    
+}
         }
     };
     }, computed: {
