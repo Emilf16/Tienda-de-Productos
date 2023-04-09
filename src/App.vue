@@ -17,7 +17,6 @@
 </template>
 
 <script>
-
 import axios from 'axios'
 import PantallaTienda from './views/PantallaTienda.vue'
 import PantallaLogin from './views/PantallaLogin.vue'
