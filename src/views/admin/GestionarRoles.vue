@@ -1,3 +1,3 @@
 <template>
-    hoola
+    hola
 </template>

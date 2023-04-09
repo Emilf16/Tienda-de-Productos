@@ -44,6 +44,7 @@
                 </v-card-title>
 
                 <v-card-text>
+
                     <v-container>
                         <v-row>
                             <v-col cols="12" sm="6" md="4">
@@ -52,6 +53,9 @@
                             <v-col cols="12" sm="6" md="4">
                                 <v-text-field v-model="editedUsuario.CorreoElectronico"
                                     label="Correo Electronico"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4" v-if="formTitle == 'Agregar usuario'">
+                                <v-text-field v-model="editedUsuario.Password" label="Contraseña"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-text-field v-model="editedUsuario.Nombres" label="Nombres"></v-text-field>
@@ -90,8 +94,14 @@
 </template>
   
 <script>
+import { useToast } from "vue-toastification";
+
 import axios from 'axios'
 export default {
+    setup() {
+        const toast = useToast();
+        return { toast }
+    },
     computed: {
         formattedDate() {
             return (usuario) => {
@@ -155,15 +165,15 @@ export default {
         nuevoUsuario: {
             idUsuario: "",
             CorreoElectronico: " ",
-            Password: "hola",
-            PasswordHash: "hola",
+            Password: " ",
+            PasswordHash: " ",
             idPerfil: 1,
             Perfil: " ",
             idEstado: 1,
             Estado: " ",
             FechaRegistro: "hola",
             UltimoIngreso: "hola",
-            Nombres: "hola",
+            Nombres: " ",
             Apellidos: "hola",
             Telefono: "hola"
         }
@@ -196,10 +206,53 @@ export default {
                         Authorization: `${token}`
                     }
                 });
+                if (response.data.Success) {
+
+                    this.toast.success(response.data.Message, {
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
+                    });
+                } else {
+                    this.toast.warning(response.data.Message, {
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
+                    });
+                }
 
                 console.log(response);
             } catch (error) {
                 console.error('Error:', error);
+                this.toast.warning('Error al crear el usuario', {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                });
             }
         },
 
@@ -216,6 +269,67 @@ export default {
             this.editedUsuario = Object.assign({}, nuevoUsuario)
             this.dialog = true
         },
+        async registrar(usuarioNuevo) {
+
+            const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
+            const data = usuarioNuevo;
+            try {
+                const token = localStorage.getItem('token');
+
+                const response = await axios.post(url, data, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+                // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
+                if (response.data.Success) {
+
+                    this.toast.success(response.data.Message, {
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
+                    });
+                } else {
+                    this.toast.warning(response.data.Message, {
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                this.toast.warning('Error al crear el usuario', {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                });
+            }
+        },
 
         guardarUsuario(usuario) {
             // Verificar que el objeto de usuario tenga los datos necesarios
@@ -224,8 +338,9 @@ export default {
                 return;
             }
 
-            if (this.formTitle === 'Agregar producto') {
-                this.listaUsuarios.push(usuario);
+            if (this.formTitle === 'Agregar usuario') {
+                console.log(usuario);
+                this.registrar(usuario);
                 console.log("Nuevo usuario agregado:", usuario);
             } else {
                 const index = this.listaUsuarios.findIndex(
@@ -233,10 +348,13 @@ export default {
                 )
                 if (index > -1) {
                     Object.assign(this.listaUsuarios[index], usuario);
-                    this.actualizarUsuario(usuario.idUsuario, usuario)
+                    this.actualizarUsuario(usuario.idUsuario, usuario);
+
+
                     console.log("Usuario actualizado:", usuario);
                 }
             }
+            this.getUsuarios();
             this.dialog = false;
         },
 

@@ -10,6 +10,12 @@ import { createStore } from 'vuex'
 import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import DataTable from 'primevue/datatable';
+import Toolbar from 'primevue/toolbar';
+import { FilterMatchMode } from 'primevue/api';
+
+
+
 
 loadFonts()
 
@@ -36,7 +42,7 @@ createApp(App)
   .use(jsPDF)
   .use(vuetify)
   .use(store)
-  .use(Image, "Image")
+  .use(FilterMatchMode)
   .use(PrimeVue)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
