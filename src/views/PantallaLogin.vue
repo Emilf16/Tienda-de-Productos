@@ -92,63 +92,61 @@ export default {
         };
     },
     methods: {
-        // async getUser() {
-        //     this.error = null;
-        //     try {
-        //         const respuesta = await axios.get('https://tiendabackend.azurewebsites.net/api/Account/GetUserData');
-        //         console.log(respuesta);
-        //         if (respuesta.length > 0) {
-        //             this.$store.commit('LogOut', true)
-        //             this.estaLogueado
-        //             console.log(respuesta)
-        //         }
-        //     } catch (error) {
-        //         if (error.response.status === 401) {
-        //             console.log('Error desconocido:', error.message);
-        //         } else {
-        //             console.log('Error desconocido:', error);
-        //         }
-        //     }
-        // },
+
+
+
 
         async registrar() {
-            this.error = null;
-            await axios.post('https://tiendabackend.azurewebsites.net/api/Usuarios',
-                {
-                    NombreUsuario: this.name,
-                    CorreoElectronico: this.email,
-                    Password: this.password,
-                    idPerfil: 1,
-                    idEstado: 1,
-                    Nombres: this.name,
-                })
-                .then(respuesta => {
-                    console.log(respuesta);
-                    if (respuesta.data.Success) {
-                        this.$store.commit('LogOut', true);
-                        this.estaLogueado;
-                    } else {
-                        console.log(respuesta.data.Success);
-                    }
-                })
+
+            const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
+            const data = {
+                NombreUsuario: this.name,
+                CorreoElectronico: this.email,
+                Password: this.password,
+                idPerfil: 1,
+                idEstado: 1,
+                Nombres: this.name,
+            };
+            try {
+                const response = await axios.post(url, data);
+                console.log(response.data.Token);
+
+                console.log(response);
+                // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
+                localStorage.setItem('token', response.data.Token);
+
+                this.$store.commit('LogOut', true);
+                this.estaLogueado;
+                console.log('Success:', response.data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         },
         async ingresar() {
-            this.error = null;
-            await axios.post('https://tiendabackend.azurewebsites.net/api/Account',
-                {
-                    userName: this.name,
-                    password: this.password
-                })
-                .then(respuesta => {
-                    console.log(respuesta);
-                    if (respuesta.data.Success) {
-                        this.$store.commit('LogOut', true)
-                        this.estaLogueado
-                    } else {
-                        console.log(respuesta.data.Success);
-                    }
-                })
+
+            const url = 'https://tiendabackend.azurewebsites.net/api/Account';
+            const data = {
+                userName: this.name,
+                password: this.password
+            };
+            try {
+                const response = await axios.post(url, data);
+                console.log(response.data.Token);
+
+                console.log(response);
+                // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
+                localStorage.setItem('token', response.data.Token);
+
+                this.$store.commit('LogOut', true);
+                this.estaLogueado;
+                console.log('Success:', response.data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         },
+
+
+
         validate() {
             this.emailBlured = true;
             this.passwordBlured = true;
