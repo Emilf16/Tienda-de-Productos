@@ -1,34 +1,86 @@
 <template>
     <v-container fluid>
-        <v-table fixed-header height="300px">
-            <thead>
-                <tr>
-                    <th class="text-left" v-for="header in headers">
-                        {{ header.text }}
-                    </th>
+        <v-col>
+            <v-row>
+                <v-spacer></v-spacer>
+                <v-btn @click="addUsuario(nuevoUsuario)"><v-icon>mdi-account-plus</v-icon></v-btn>
+                <v-btn @click="getUsuarios" class="ml-5"><v-icon>mdi-restart</v-icon></v-btn>
+            </v-row>
+            <div class="mb-5"></div>
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(usuario, index)  in listaUsuarios" v-bind:key="index" v-bind:usuario="usuario">
-                    <td>{{ usuario.idUsuario }}</td>
-                    <td>{{ usuario.NombreUsuario }}</td>
-                    <td>{{ usuario.Nombres }}</td>
-                    <td>{{ usuario.Apellidos }}</td>
-                    <td>{{ usuario.CorreoElectronico }}</td>
-                    <td>{{ usuario.Perfil }}</td>
-                    <td>
+            <v-row>
+                <v-card style="width: 100%;">
+
+
+                    <v-table fixed-header height="auto">
+                        <thead>
+                            <tr>
+                                <th class="text-left" v-for="header in headers">
+                                    {{ header.text }}
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(usuario, index)  in listaUsuarios" v-bind:key="index" v-bind:usuario="usuario">
+                                <td>{{ usuario.idUsuario }}</td>
+                                <td>{{ usuario.NombreUsuario }}</td>
+                                <td>{{ usuario.CorreoElectronico }}</td>
+                                <td>{{ usuario.Perfil }}</td>
+                                <td>{{ formattedDate(usuario) }}</td>
+                                <td>{{ usuario.Estado }}</td>
+                                <td> <v-icon @click="editUsuario(usuario)">mdi-pencil</v-icon></td>
+                            </tr>
+                        </tbody>
+                    </v-table>
+                </v-card>
+            </v-row>
+        </v-col>
+
+        <v-dialog v-model="dialog" max-width="900px">
+            <v-card>
+                <v-card-title style="margin-top: 20px; margin-left: 24px;">
+                    <span class="text-h5">{{ formTitle }}</span>
+                </v-card-title>
+
+                <v-card-text>
+                    <v-container>
                         <v-row>
-                            <v-btn @click="getUser">hola</v-btn>
-                            <div style="width: 5px;">
-                            </div>
-                            <v-btn></v-btn>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.NombreUsuario" label="Nombre"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.CorreoElectronico"
+                                    label="Correo Electronico"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.Perfil" label="Perfil"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.Estado" label="Estado"></v-text-field>
+                            </v-col>
+                            <!-- <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.strCategoryThumb" label="Foto"></v-text-field>
+                            </v-col> -->
                         </v-row>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="#BE1D1D" variant="flat" @click="closeDialog">
+                        <span style="color:white">
+                            Cancelar
+                        </span>
+                    </v-btn>
+                    <v-btn color="#008F39" variant="flat" @click="guardarUsuario(editedUsuario)">
+                        <span style="color:white">
+                            Guardar
+                        </span>
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
-                    </td>
-                </tr>
-            </tbody>
-        </v-table>
 
 
     </v-container>
@@ -37,104 +89,157 @@
 <script>
 import axios from 'axios'
 export default {
+    computed: {
+        formattedDate() {
+            return (usuario) => {
+                const dateObject = new Date(usuario.UltimoIngreso);
+                return `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
+            };
+        },
+        async getUsers() {
+            try {
+                const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
+                const token = localStorage.getItem('token');
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+
+                this.listaUsuarios = response.data;
+                for (const usuario of this.listaUsuarios) {
+                    const dateObject = new Date(usuario.UltimoIngreso);
+                    const formattedDate = `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
+                    this.horasIngreso.push(formattedDate);
+                }
+                console.log('Success:', response.data);
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+    },
     data: () => ({
         dialog: false,
         headers: [
             { text: 'ID', value: 'id' },
             { text: 'Usuario', value: 'usuario' },
-            { text: 'Nombre', value: 'nombre' },
-            { text: 'Apellido', value: 'apellido' },
             { text: 'Correo electrónico', value: 'email' },
             { text: 'Perfil', value: 'perfil' },
+            { text: 'Ultimo Ingreso', value: 'ultimoIngreso' },
+            { text: 'Estado', value: 'estado' },
             { text: 'Acciones', value: 'acciones' },
         ],
-        listaUsuarios: [
-            {
-                idUsuario: 1,
-                NombreUsuario: "Emil@2314",
-                CorreoElectronico: "Emil@mail.com",
-                Password: "1234512345",
-                PasswordHash: "QEA=sdsdsdsdsdsds",
-                idPerfil: 2,
-                Perfil: "Cliente",
-                idEstado: 7,
-                Estado: "Activo",
-                FechaRegistro: "2023-04-07T17:29:45.8845929-07:00",
-                UltimoIngreso: "2023-04-07T17:29:45.8845929-07:00",
-                Nombres: "Emil Francisco",
-                Apellidos: "Solano Gil",
-                Telefono: "8095555555"
-            },
-            {
-                idUsuario: 2,
-                NombreUsuario: "Divanny@1223",
-                CorreoElectronico: "Divanny@mail.com",
-                Password: "1234512345",
-                PasswordHash: "QEA=sdsdsdsdsdsds",
-                idPerfil: 1,
-                Perfil: "Admin",
-                idEstado: 7,
-                Estado: "Activo",
-                FechaRegistro: "2023-04-07T17:29:45.8845929-07:00",
-                UltimoIngreso: "2023-04-07T17:29:45.8845929-07:00",
-                Nombres: "Divanny",
-                Apellidos: "Perez Mendez",
-                Telefono: "8094444444"
-            }
-        ]
-
+        listaUsuarios: [],
+        horasIngreso: [],
+        editedUsuario: {
+            idUsuario: null,
+            NombreUsuario: " ",
+            CorreoElectronico: " ",
+            Password: null,
+            PasswordHash: null,
+            idPerfil: null,
+            Perfil: " ",
+            idEstado: null,
+            Estado: " ",
+            FechaRegistro: " ",
+            UltimoIngreso: " ",
+            Nombres: " ",
+            Apellidos: null,
+            Telefono: null
+        },
+        nuevoUsuario: {
+            idUsuario: "",
+            CorreoElectronico: " ",
+            Password: "hola",
+            PasswordHash: "hola",
+            idPerfil: 1,
+            Perfil: " ",
+            idEstado: 1,
+            Estado: " ",
+            FechaRegistro: "hola",
+            UltimoIngreso: "hola",
+            Nombres: "hola",
+            Apellidos: "hola",
+            Telefono: "hola"
+        }
     }),
-
-
-
     methods: {
-        async getUser() {
-            this.error = null;
+        async getUsuarios() {
             try {
-                const respuesta = await axios.get('https://tiendabackend.azurewebsites.net/api/Account/GetUserData');
-                console.log(respuesta);
-                if (respuesta.length > 0) {
-                    this.$store.commit('LogOut', true)
-                    this.estaLogueado
-                    console.log(respuesta)
-                }
+                const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
+                const token = localStorage.getItem('token');
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+
+                this.listaUsuarios = response.data;
+                console.log('Success:', response.data);
             } catch (error) {
-                console.log(error);
-                if (error.response.status === 401) {
-                    console.log('Error desconocido:', error.message);
-                } else {
-                    console.log('Error desconocido:', error);
-                }
+                console.error('Error:', error);
+            }
+        },
+        async actualizarUsuario(idUsuario, usuarioActualizado) {
+            try {
+                const url = `https://tiendabackend.azurewebsites.net/api/Usuarios?idUsuario=${idUsuario}`;
+                const token = localStorage.getItem('token');
+
+                const response = await axios.put(url, usuarioActualizado, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+
+                console.log(response);
+            } catch (error) {
+                console.error('Error:', error);
             }
         },
 
 
-        editItem(item) {
-            this.editedIndex = this.desserts.indexOf(item)
-            this.editedItem = Object.assign({}, item)
+
+        editUsuario(usuario) {
+            this.dialog = true
+            this.formTitle = 'Editar usuario'
+            this.editedIndex = this.listaUsuarios.indexOf(usuario)
+            this.editedUsuario = Object.assign({}, usuario)
+        },
+        addUsuario(nuevoUsuario) {
+            this.formTitle = 'Agregar usuario'
+            this.editedUsuario = Object.assign({}, nuevoUsuario)
             this.dialog = true
         },
 
-        deleteItem(item) {
-            const index = this.desserts.indexOf(item)
-            confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
-        },
-
-        close() {
-            this.dialog = false
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
-            })
-        },
-
-        save() {
-            if (this.editedIndex > -1) {
-                Object.assign(this.desserts[this.editedIndex], this.editedItem)
-            } else {
-                this.desserts.push(this.editedItem)
+        guardarUsuario(usuario) {
+            // Verificar que el objeto de usuario tenga los datos necesarios
+            if (!usuario.NombreUsuario || !usuario.CorreoElectronico || !usuario.idPerfil) {
+                console.error("Faltan datos de usuario para guardar");
+                return;
             }
-            this.close()
+
+            if (this.formTitle === 'Agregar producto') {
+                this.listaUsuarios.push(usuario);
+                console.log("Nuevo usuario agregado:", usuario);
+            } else {
+                const index = this.listaUsuarios.findIndex(
+                    (u) => u.idUsuario === usuario.idUsuario
+                )
+                console.log(index);
+                if (index > -1) {
+                    Object.assign(this.listaUsuarios[index], usuario);
+                    this.actualizarUsuario(index, usuario)
+                    console.log("Usuario actualizado:", usuario);
+                }
+            }
+            this.dialog = false;
+        },
+
+        closeDialog() {
+            this.dialog = false
         },
     },
 }
