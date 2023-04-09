@@ -54,14 +54,17 @@
                                     label="Correo Electronico"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.Nombres" label="Nombres"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
                                 <v-text-field v-model="editedUsuario.Perfil" label="Perfil"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-text-field v-model="editedUsuario.Estado" label="Estado"></v-text-field>
                             </v-col>
-                            <!-- <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="editedUsuario.strCategoryThumb" label="Foto"></v-text-field>
-                            </v-col> -->
+                            <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="editedUsuario.idPerfil" label="id Perfil"></v-text-field>
+                            </v-col>
                         </v-row>
                     </v-container>
                 </v-card-text>
@@ -228,10 +231,9 @@ export default {
                 const index = this.listaUsuarios.findIndex(
                     (u) => u.idUsuario === usuario.idUsuario
                 )
-                console.log(index);
                 if (index > -1) {
                     Object.assign(this.listaUsuarios[index], usuario);
-                    this.actualizarUsuario(index, usuario)
+                    this.actualizarUsuario(usuario.idUsuario, usuario)
                     console.log("Usuario actualizado:", usuario);
                 }
             }
