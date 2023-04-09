@@ -8,8 +8,8 @@ import Image from 'primevue/image';
 import { createApp } from 'vue'
 import { createStore } from 'vuex'
 import { jsPDF } from "jspdf";
-import ConfirmPopup from 'primevue/confirmpopup';
-import ConfirmationService from 'primevue/confirmationservice';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 loadFonts()
 
@@ -38,4 +38,9 @@ createApp(App)
   .use(store)
   .use(Image, "Image")
   .use(PrimeVue)
+  .use(Toast, {
+    transition: "Vue-Toastification__fade",
+    maxToasts: 20,
+    newestOnTop: true
+  })
   .mount('#app')

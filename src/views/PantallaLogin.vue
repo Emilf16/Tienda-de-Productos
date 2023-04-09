@@ -49,11 +49,22 @@
     </v-container>
 </template>
 
+<style>
+    body {
+        background-color: gray;
+    }
+</style>
 
 <script>
+import { useToast } from "vue-toastification";
 
 import axios from 'axios'
 export default {
+    setup() {
+      const toast = useToast();
+      return { toast }
+    },
+
     computed: {
         estaLogueado() {
             return this.$store.state.estaLogueado
@@ -92,10 +103,6 @@ export default {
         };
     },
     methods: {
-
-
-
-
         async registrar() {
 
             const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
@@ -109,15 +116,41 @@ export default {
             };
             try {
                 const response = await axios.post(url, data);
-                console.log(response.data.Token);
-
-                console.log(response);
                 // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
-                localStorage.setItem('token', response.data.Token);
+                if (response.data.Success) {
+                    localStorage.setItem('token', response.data.Token);
+                    this.$store.commit('LogOut', true);
+                    this.estaLogueado;
 
-                this.$store.commit('LogOut', true);
-                this.estaLogueado;
-                console.log('Success:', response.data);
+                    this.toast.success(response.data.Message, {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                    });
+                }
+                else {
+                    this.toast.warning(response.data.Message, {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                    });
+                }
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -131,21 +164,45 @@ export default {
             };
             try {
                 const response = await axios.post(url, data);
-                console.log(response.data.Token);
-
-                console.log(response);
                 // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
-                localStorage.setItem('token', response.data.Token);
+                if (response.data.Success) {
+                    localStorage.setItem('token', response.data.Token);
+                    this.$store.commit('LogOut', true);
+                    this.estaLogueado;
 
-                this.$store.commit('LogOut', true);
-                this.estaLogueado;
-                console.log('Success:', response.data);
+                    this.toast.success(response.data.Message, {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                    });
+                }
+                else {
+                    this.toast.warning(response.data.Message, {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                    });
+                }
             } catch (error) {
                 console.error('Error:', error);
             }
         },
-
-
 
         validate() {
             this.emailBlured = true;
