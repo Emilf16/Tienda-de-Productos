@@ -2,7 +2,7 @@
     <v-app id="inspire">
         <v-app-bar style="background-color: #090C29; color: white">
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-            <router-link to="/pantallaProductos"
+            <router-link to="/"
                 style="text-decoration: none; color: inherit;"><v-toolbar-title>Tienda</v-toolbar-title></router-link>
             <v-spacer> </v-spacer>
             <v-btn class="mx-3">

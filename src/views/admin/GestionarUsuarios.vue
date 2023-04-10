@@ -4,14 +4,11 @@
             <v-row>
                 <v-spacer></v-spacer>
                 <v-btn @click="addUsuario(nuevoUsuario)"><v-icon>mdi-account-plus</v-icon></v-btn>
-                <v-btn @click="getUsuarios" class="ml-5"><v-icon>mdi-restart</v-icon></v-btn>
             </v-row>
             <div class="mb-5"></div>
 
             <v-row>
                 <v-card style="width: 100%;">
-
-
                     <v-table fixed-header height="auto">
                         <thead>
                             <tr>
@@ -61,19 +58,25 @@
                                 <v-text-field v-model="editedUsuario.Nombres" label="Nombres"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="editedUsuario.Perfil" label="Perfil"></v-text-field>
+                                <v-combobox v-model="perfilSeleccionado" @change=" " :items="perfilesListado"
+                                    item-value="idPerfil" item-title="Nombre" label="Perfiles" outlined></v-combobox>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="editedUsuario.Estado" label="Estado"></v-text-field>
+                                <v-combobox v-model="estadoSeleccionado" @change="cambioEstado()" :items="estados"
+                                    item-value="idEstado" item-title="Nombre" label="Estados" outlined></v-combobox>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="editedUsuario.idPerfil" label="id Perfil"></v-text-field>
-                            </v-col>
+
+
                         </v-row>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
+                    <v-btn color="#BE1D1D" variant="flat" @click="klk">
+                        <span style="color:white">
+                            jij
+                        </span>
+                    </v-btn>
                     <v-btn color="#BE1D1D" variant="flat" @click="closeDialog">
                         <span style="color:white">
                             Cancelar
@@ -95,46 +98,28 @@
   
 <script>
 import { useToast } from "vue-toastification";
-
 import axios from 'axios'
 export default {
-    setup() {
-        const toast = useToast();
-        return { toast }
-    },
-    computed: {
-        formattedDate() {
-            return (usuario) => {
-                const dateObject = new Date(usuario.UltimoIngreso);
-                return `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
-            };
-        },
-        async getUsers() {
-            try {
-                const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
-                const token = localStorage.getItem('token');
-
-                const response = await axios.get(url, {
-                    headers: {
-                        Authorization: `${token}`
-                    }
-                });
-
-                this.listaUsuarios = response.data;
-                for (const usuario of this.listaUsuarios) {
-                    const dateObject = new Date(usuario.UltimoIngreso);
-                    const formattedDate = `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
-                    this.horasIngreso.push(formattedDate);
-                }
-                console.log('Success:', response.data);
-
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        },
-    },
     data: () => ({
         dialog: false,
+        listaUsuarios: [],
+        horasIngreso: [],
+        perfilesListado: [],
+        estados: [],
+        perfilSeleccionado: {
+            idPerfil: 0,
+            Nombre: " ",
+            Descripcion: " ",
+            CantPermisos: 0,
+            PorDefecto: false,
+            Vistas: null,
+            Usuarios: null
+        },
+        estadoSeleccionado: {
+            idEstado: 0,
+            Nombre: " ",
+            Descripcion: " "
+        },
         headers: [
             { text: 'ID', value: 'id' },
             { text: 'Usuario', value: 'usuario' },
@@ -144,23 +129,17 @@ export default {
             { text: 'Estado', value: 'estado' },
             { text: 'Acciones', value: 'acciones' },
         ],
-        listaUsuarios: [],
-        horasIngreso: [],
         editedUsuario: {
             idUsuario: null,
             NombreUsuario: " ",
             CorreoElectronico: " ",
-            Password: null,
-            PasswordHash: null,
             idPerfil: null,
             Perfil: " ",
             idEstado: null,
             Estado: " ",
-            FechaRegistro: " ",
-            UltimoIngreso: " ",
             Nombres: " ",
-            Apellidos: null,
-            Telefono: null
+            Apellidos: " ",
+            Telefono: " "
         },
         nuevoUsuario: {
             idUsuario: "",
@@ -169,8 +148,8 @@ export default {
             PasswordHash: " ",
             idPerfil: 1,
             Perfil: " ",
-            idEstado: 1,
-            Estado: " ",
+            idEstado: 2,
+            Estado: '',
             FechaRegistro: "hola",
             UltimoIngreso: "hola",
             Nombres: " ",
@@ -178,7 +157,14 @@ export default {
             Telefono: "hola"
         }
     }),
+    setup() {
+        const toast = useToast();
+        return { toast }
+    },
     methods: {
+        klk() {
+            console.log(this.editedUsuario)
+        },
         async getUsuarios() {
             try {
                 const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
@@ -191,7 +177,42 @@ export default {
                 });
 
                 this.listaUsuarios = response.data;
-                console.log('Success:', response.data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+        async getEstadosUsuarios() {
+            try {
+                const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios/GetEstadosUsuarios';
+                const token = localStorage.getItem('token');
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+
+                this.estados = response.data;
+                console.log(response.data)
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+        async getPerfiles() {
+            try {
+                const url = 'https://tiendabackend.azurewebsites.net/api/Perfiles';
+                const token = localStorage.getItem('token');
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `${token}`
+                    }
+                });
+
+                this.perfilesListado = response.data;
+                console.log(response.data)
+
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -237,7 +258,6 @@ export default {
                     });
                 }
 
-                console.log(response);
             } catch (error) {
                 console.error('Error:', error);
                 this.toast.warning('Error al crear el usuario', {
@@ -254,20 +274,6 @@ export default {
                     rtl: false
                 });
             }
-        },
-
-
-
-        editUsuario(usuario) {
-            this.dialog = true
-            this.formTitle = 'Editar usuario'
-            this.editedIndex = this.listaUsuarios.indexOf(usuario)
-            this.editedUsuario = Object.assign({}, usuario)
-        },
-        addUsuario(nuevoUsuario) {
-            this.formTitle = 'Agregar usuario'
-            this.editedUsuario = Object.assign({}, nuevoUsuario)
-            this.dialog = true
         },
         async registrar(usuarioNuevo) {
 
@@ -330,17 +336,30 @@ export default {
                 });
             }
         },
-
         guardarUsuario(usuario) {
             // Verificar que el objeto de usuario tenga los datos necesarios
             if (!usuario.NombreUsuario || !usuario.CorreoElectronico || !usuario.idPerfil) {
-                console.error("Faltan datos de usuario para guardar");
+                this.toast.error("Faltan datos del usuario.", {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                });
                 return;
             }
 
             if (this.formTitle === 'Agregar usuario') {
                 console.log(usuario);
                 this.registrar(usuario);
+
+                this.getUsuarios()
                 console.log("Nuevo usuario agregado:", usuario);
             } else {
                 const index = this.listaUsuarios.findIndex(
@@ -349,19 +368,57 @@ export default {
                 if (index > -1) {
                     Object.assign(this.listaUsuarios[index], usuario);
                     this.actualizarUsuario(usuario.idUsuario, usuario);
+                    this.getUsuarios()
 
 
                     console.log("Usuario actualizado:", usuario);
                 }
             }
-            this.getUsuarios();
             this.dialog = false;
         },
+        editUsuario(usuario) {
+            this.dialog = true
+            this.formTitle = 'Editar usuario'
+            this.editedIndex = this.listaUsuarios.indexOf(usuario)
+            this.estadoSeleccionado.idEstado = usuario.idEstado;
+            this.estadoSeleccionado.Nombre = usuario.Estado;
 
+            this.perfilSeleccionado.idPerfil = usuario.idPerfil;
+            this.perfilSeleccionado.Nombre = usuario.Perfil;
+            this.editedUsuario = Object.assign({}, usuario)
+        },
+        addUsuario(nuevoUsuario) {
+            this.formTitle = 'Agregar usuario'
+            this.estadoSeleccionado.idEstado = nuevoUsuario.idEstado;
+            this.estadoSeleccionado.Nombre = nuevoUsuario.Estado;
+            this.editedUsuario = Object.assign({}, nuevoUsuario)
+            this.dialog = true
+        },
         closeDialog() {
+
             this.dialog = false
         },
+        cambioEstado() {
+            this.editedUsuario.idEstado = this.estadoSeleccionado.idEstado;
+
+            this.editedUsuario.Perfil = this.estadoSeleccionado.Nombre;
+
+            console.log(this.estadoSeleccionado.idEstado);  // Imprime solo el idEstado
+        }
     },
+    computed: {
+        formattedDate() {
+            return (usuario) => {
+                const dateObject = new Date(usuario.UltimoIngreso);
+                return `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
+            };
+        },
+    },
+    mounted() {
+        this.getEstadosUsuarios();
+        this.getUsuarios();
+        this.getPerfiles();
+    }
 }
 </script>
  
