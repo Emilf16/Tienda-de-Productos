@@ -1,7 +1,27 @@
 <template>
-    <v-container fluid>
+    <v-carousel
+        cycle
+        height="400"
+        hide-delimiter-background
+        show-arrows="hover"
+        hide-delimiters
+    >
+        <v-carousel-item v-for="(category, index) in categoriesSlider" :key="index" >
+            <v-sheet height="100%" 
+                :style="'background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(' + category.image + ');' + 'background-position: center center; background-repeat: no-repeat; background-size: cover;'"
+                class="d-flex flex-column justify-center align-center"
+            >
+                <h2 class="text-h2 mb-2 text-white" style="font-family: 'Poppins', sans-serif !important; font-weight: bold;">{{ category.title }}</h2>
+                <p class="text-h5 mb-5 text-white" style="font-family: 'Poppins', sans-serif !important">{{ category.description }}</p>
+                <v-btn class="mx-auto my-2" color="warning" @click="viewCategory(category)">
+                    Ver más
+                </v-btn>
+            </v-sheet>
+        </v-carousel-item>
+    </v-carousel>
 
-        <v-row>
+    <v-container fluid>
+        <v-row class="mx-4 my-4">
             <v-col v-for="category in categories" v-bind:key="category.idCategory" v-bind:category="category" cols="12"
                 lg="3" md="4" sm="6" xs="12">
 
@@ -37,13 +57,13 @@
                     <v-card-title>En Stock</v-card-title>
 
                     <v-card-actions class=" d-flex" style="justify-content: space-between;">
-                        <v-btn color="blue" variant="flat" text class="flex-grow-1 ml-2">
+                        <v-btn color="#090C29" variant="flat" text class="flex-grow-1 ml-2">
                             <span style="color: white; font-weight: bold;">
                                 ver
                             </span>
                         </v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn color="#FFC107" variant="flat" class="flex-grow-4 mr-2"
+                        <v-btn color="warning" variant="flat" class="flex-grow-4 mr-2"
                             @click="agregarNuevoProducto(category)">
                             <span style="color: white; font-weight: bold;">
                                 + Agregar al carrito
@@ -74,7 +94,43 @@ export default {
             current: 1,
             pageSize: 5, rating: 3, loading: false,
             selection: 1,
+            colors: [
+            'indigo',
+            'warning',
+            'pink darken-2',
+            'red lighten-1',
+            'deep-purple accent-4',
+            ],
+            slides: [
+            'First',
+            'Second',
+            'Third',
+            'Fourth',
+            'Fifth',
+            ],
 
+            categoriesSlider: [
+                {
+                    title: "Ropa",
+                    description: "Vestido de verano para mujer de color rojo.",
+                    image: "https://cdn.stocksnap.io/img-thumbs/960w/clothes-store_Q2WKRAM2O4.jpg",
+                },
+                {
+                    title: "Tecnología",
+                    description: "Vestido de versdfde color rojo.",
+                    image: "https://cdn.stocksnap.io/img-thumbs/960w/computer-keyboard_IHIHTFK8YH.jpg",
+                },
+                {
+                    title: "Hogar",
+                    description: "Vsdfo.",
+                    image: "https://cdn.stocksnap.io/img-thumbs/960w/bed-bedroom_UJCTKDCTXC.jpg",
+                },
+                {
+                    title: "Libros",
+                    description: "Vestido de sdf rojo.",
+                    image: "https://cdn.stocksnap.io/img-thumbs/960w/developer-books_KAUFJW1PEQ.jpg",
+                },
+            ],
         }
     },
     mounted() {
