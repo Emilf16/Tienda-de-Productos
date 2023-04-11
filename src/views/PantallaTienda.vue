@@ -9,8 +9,8 @@
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;">
                     <v-badge :content="0" floating>
                         <div class="d-flex align-center">
-                        <span>Carrito</span>
-                        <v-icon size="large" class="ml-2" icon="mdi-cart-outline"></v-icon>
+                            <span>Carrito</span>
+                            <v-icon size="large" class="ml-2" icon="mdi-cart-outline"></v-icon>
                         </div>
                     </v-badge>
                 </router-link>
@@ -19,7 +19,8 @@
             <v-menu class="mx-3" open-on-hover>
                 <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="mx-3">
-                        <v-avatar size="x-small" class="mr-2" image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"></v-avatar>
+                        <v-avatar size="x-small" class="mr-2"
+                            image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"></v-avatar>
                         <span>Username</span>
                         <v-icon>mdi-chevron-down</v-icon>
                     </v-btn>
@@ -27,14 +28,14 @@
 
                 <v-list class="text-center">
                     <v-list-item>
-                        <v-btn  variant="text">Mi perfil</v-btn>
+                        <v-btn variant="text">Mi perfil</v-btn>
                     </v-list-item>
                     <v-list-item>
-                        <v-btn  variant="text">Mis ordenes</v-btn>
+                        <v-btn variant="text">Mis ordenes</v-btn>
                     </v-list-item>
                     <v-divider></v-divider>
                     <v-list-item>
-                        <v-btn  variant="text" @click="logOut">Cerrar sesión</v-btn>
+                        <v-btn variant="text" @click="logOut">Cerrar sesión</v-btn>
                     </v-list-item>
                 </v-list>
             </v-menu>
@@ -53,47 +54,53 @@
                 <!-- gestionar productos -->
                 <router-link to="/gestionarStock" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-cart-arrow-down" title="Gestionar Stock"
-                        value="carrito"></v-list-item></router-link>
+                        value="stock"></v-list-item></router-link>
 
                 <!-- gestionar Usuario -->
                 <router-link to="/gestionarUsuarios" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-account-edit" title="Gestionar Usuarios"
-                        value="carrito"></v-list-item></router-link>
+                        value="usuarios"></v-list-item></router-link>
                 <!-- gestionar Roles -->
                 <router-link to="/gestionarRoles" style="text-decoration: none; color: inherit;"><v-list-item
-                        prepend-icon="mdi-account-key" title="Gestionar Roles" value="carrito"></v-list-item></router-link>
+                        prepend-icon="mdi-account-key" title="Gestionar Roles" value="roles"></v-list-item></router-link>
+                <!-- gestionar Categorias -->
+                <router-link to="/gestionarCategorias" style="text-decoration: none; color: inherit;"><v-list-item
+                        prepend-icon="mdi-store" title="Gestionar Categorias" value="categoria"></v-list-item></router-link>
 
             </v-list>
         </v-navigation-drawer>
 
         <v-main style="background-color: white;">
-            <router-view/>
+            <router-view />
         </v-main>
         <!---->
         <v-footer color="#090C29" class="white--text">
             <v-container>
-            <v-row style="color: white">
-                <v-col cols="12" md="4">
-                <h3 class="mb-4">Sobre nosotros</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut tellus eget neque tincidunt semper. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce eget sapien tincidunt, maximus eros ac, cursus ante.</p>
-                </v-col>
-                <v-col cols="12" md="4">
-                <h3 class="mb-4">Contáctanos</h3>
-                <p>Teléfono: 123-456-7890</p>
-                <p>Email: info@mi-tienda.com</p>
-                <p>Dirección: 123 Main St, Ciudad, Estado ZIP</p>
-                </v-col>
-                <v-col cols="12" md="4">
-                <h3 class="mb-4">Síguenos en redes sociales</h3>
-                <v-row>
-                    <v-col cols="4" md="3" v-for="icon in socialIcons" :key="icon">
-                    <v-btn color="#fff" depressed class="rounded-lg" :href="'https://' + icon.link" target="_blank">
-                        <v-icon size="28">{{ icon.icon }}</v-icon>
-                    </v-btn>
+                <v-row style="color: white">
+                    <v-col cols="12" md="4">
+                        <h3 class="mb-4">Sobre nosotros</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut tellus eget neque tincidunt
+                            semper. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis
+                            egestas. Fusce eget sapien tincidunt, maximus eros ac, cursus ante.</p>
+                    </v-col>
+                    <v-col cols="12" md="4">
+                        <h3 class="mb-4">Contáctanos</h3>
+                        <p>Teléfono: 123-456-7890</p>
+                        <p>Email: info@mi-tienda.com</p>
+                        <p>Dirección: 123 Main St, Ciudad, Estado ZIP</p>
+                    </v-col>
+                    <v-col cols="12" md="4">
+                        <h3 class="mb-4">Síguenos en redes sociales</h3>
+                        <v-row>
+                            <v-col cols="4" md="3" v-for="icon in socialIcons" :key="icon">
+                                <v-btn color="#fff" depressed class="rounded-lg" :href="'https://' + icon.link"
+                                    target="_blank">
+                                    <v-icon size="28">{{ icon.icon }}</v-icon>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
                     </v-col>
                 </v-row>
-                </v-col>
-            </v-row>
             </v-container>
         </v-footer>
     </v-app>

@@ -24,7 +24,7 @@
                                 <td>{{ usuario.NombreUsuario }}</td>
                                 <td>{{ usuario.CorreoElectronico }}</td>
                                 <td>{{ usuario.Perfil }}</td>
-                                <td>{{ formattedDate(usuario) }}</td>
+                                <td>{{ formatDate(usuario) }}</td>
                                 <td>{{ usuario.Estado }}</td>
                                 <td> <v-icon @click="editUsuario(usuario)">mdi-pencil</v-icon></td>
                             </tr>
@@ -39,44 +39,51 @@
                 <v-card-title style="margin-top: 20px; margin-left: 24px;">
                     <span class="text-h5">{{ formTitle }}</span>
                 </v-card-title>
-
                 <v-card-text>
-
                     <v-container>
                         <v-row>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="editedUsuario.NombreUsuario" label="Nombre"></v-text-field>
+                                <v-text-field v-model="editedUsuario.NombreUsuario"
+                                    label="Nombre de Usuario"></v-text-field>
                             </v-col>
+
                             <v-col cols="12" sm="6" md="4">
                                 <v-text-field v-model="editedUsuario.CorreoElectronico"
                                     label="Correo Electronico"></v-text-field>
                             </v-col>
+
                             <v-col cols="12" sm="6" md="4" v-if="formTitle == 'Agregar usuario'">
                                 <v-text-field v-model="editedUsuario.Password" label="Contraseña"></v-text-field>
                             </v-col>
+
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="editedUsuario.Nombres" label="Nombres"></v-text-field>
+                                <v-text-field v-model="editedUsuario.Nombres" label="Nombre"></v-text-field>
                             </v-col>
+
                             <v-col cols="12" sm="6" md="4">
-                                <v-combobox v-model="perfilSeleccionado" @change=" " :items="perfilesListado"
-                                    item-value="idPerfil" item-title="Nombre" label="Perfiles" outlined></v-combobox>
+                                <v-text-field v-model="editedUsuario.Apellidos" label="Apellido"></v-text-field>
                             </v-col>
+
                             <v-col cols="12" sm="6" md="4">
-                                <v-combobox v-model="estadoSeleccionado" @change="cambioEstado()" :items="estados"
+                                <v-combobox @update:model-value=cambioPerfil() v-model="perfilSeleccionado"
+                                    :items="perfilesListado" item-value="idPerfil" item-title="Nombre" label="Perfiles"
+                                    outlined></v-combobox>
+                            </v-col>
+
+                            <v-col cols="12" sm="6" md="4">
+                                <v-combobox @update:model-value=cambioEstado() v-model="estadoSeleccionado" :items="estados"
                                     item-value="idEstado" item-title="Nombre" label="Estados" outlined></v-combobox>
                             </v-col>
-
-
                         </v-row>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="#BE1D1D" variant="flat" @click="klk">
+                    <!-- <v-btn color="#BE1D1D" variant="flat" @click="print">
                         <span style="color:white">
-                            jij
+                            test
                         </span>
-                    </v-btn>
+                    </v-btn> -->
                     <v-btn color="#BE1D1D" variant="flat" @click="closeDialog">
                         <span style="color:white">
                             Cancelar
@@ -90,15 +97,13 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
-
-
     </v-container>
 </template>
   
 <script>
 import { useToast } from "vue-toastification";
 import axios from 'axios'
+
 export default {
     data: () => ({
         dialog: false,
@@ -107,16 +112,16 @@ export default {
         perfilesListado: [],
         estados: [],
         perfilSeleccionado: {
-            idPerfil: 0,
+            idPerfil: '',
             Nombre: " ",
             Descripcion: " ",
-            CantPermisos: 0,
+            CantPermisos: '',
             PorDefecto: false,
             Vistas: null,
             Usuarios: null
         },
         estadoSeleccionado: {
-            idEstado: 0,
+            idEstado: '',
             Nombre: " ",
             Descripcion: " "
         },
@@ -133,9 +138,9 @@ export default {
             idUsuario: null,
             NombreUsuario: " ",
             CorreoElectronico: " ",
-            idPerfil: null,
+            idPerfil: '',
             Perfil: " ",
-            idEstado: null,
+            idEstado: '',
             Estado: " ",
             Nombres: " ",
             Apellidos: " ",
@@ -145,16 +150,18 @@ export default {
             idUsuario: "",
             CorreoElectronico: " ",
             Password: " ",
+
+            NombreUsuario: " ",
             PasswordHash: " ",
-            idPerfil: 1,
+            idPerfil: "",
             Perfil: " ",
-            idEstado: 2,
+            idEstado: "",
             Estado: '',
-            FechaRegistro: "hola",
-            UltimoIngreso: "hola",
+            FechaRegistro: "",
+            UltimoIngreso: "",
             Nombres: " ",
-            Apellidos: "hola",
-            Telefono: "hola"
+            Apellidos: "",
+            Telefono: ""
         }
     }),
     setup() {
@@ -162,9 +169,7 @@ export default {
         return { toast }
     },
     methods: {
-        klk() {
-            console.log(this.editedUsuario)
-        },
+
         async getUsuarios() {
             try {
                 const url = 'https://tiendabackend.azurewebsites.net/api/Usuarios';
@@ -193,7 +198,7 @@ export default {
                 });
 
                 this.estados = response.data;
-                console.log(response.data)
+                // console.log(response.data)
 
             } catch (error) {
                 console.error('Error:', error);
@@ -211,7 +216,7 @@ export default {
                 });
 
                 this.perfilesListado = response.data;
-                console.log(response.data)
+                // console.log(response.data)
 
             } catch (error) {
                 console.error('Error:', error);
@@ -337,6 +342,12 @@ export default {
             }
         },
         guardarUsuario(usuario) {
+
+            this.editedUsuario.idEstado = this.estadoSeleccionado.idEstado;
+            this.editedUsuario.Estado = this.estadoSeleccionado.Nombre;
+
+            this.editedUsuario.idPerfil = this.perfilSeleccionado.idPerfil;
+            this.editedUsuario.Perfil = this.perfilSeleccionado.Nombre;
             // Verificar que el objeto de usuario tenga los datos necesarios
             if (!usuario.NombreUsuario || !usuario.CorreoElectronico || !usuario.idPerfil) {
                 this.toast.error("Faltan datos del usuario.", {
@@ -356,10 +367,13 @@ export default {
             }
 
             if (this.formTitle === 'Agregar usuario') {
-                console.log(usuario);
+
+
                 this.registrar(usuario);
 
                 this.getUsuarios()
+                console.log(usuario);
+
                 console.log("Nuevo usuario agregado:", usuario);
             } else {
                 const index = this.listaUsuarios.findIndex(
@@ -375,22 +389,21 @@ export default {
                 }
             }
             this.dialog = false;
+
+            this.getUsuarios()
         },
         editUsuario(usuario) {
             this.dialog = true
             this.formTitle = 'Editar usuario'
             this.editedIndex = this.listaUsuarios.indexOf(usuario)
-            this.estadoSeleccionado.idEstado = usuario.idEstado;
             this.estadoSeleccionado.Nombre = usuario.Estado;
-
+            this.estadoSeleccionado.idEstado = usuario.idEstado;
             this.perfilSeleccionado.idPerfil = usuario.idPerfil;
             this.perfilSeleccionado.Nombre = usuario.Perfil;
             this.editedUsuario = Object.assign({}, usuario)
         },
         addUsuario(nuevoUsuario) {
             this.formTitle = 'Agregar usuario'
-            this.estadoSeleccionado.idEstado = nuevoUsuario.idEstado;
-            this.estadoSeleccionado.Nombre = nuevoUsuario.Estado;
             this.editedUsuario = Object.assign({}, nuevoUsuario)
             this.dialog = true
         },
@@ -399,20 +412,52 @@ export default {
             this.dialog = false
         },
         cambioEstado() {
+
+            // this.editedUsuario.idEstado = this.estadoSeleccionado.idEstado;
+            // this.editedUsuario.Estado = this.estadoSeleccionado.Nombre;
+            // this.nuevoUsuario.idEstado = this.estadoSeleccionado.idEstado;
+            // this.nuevoUsuario.Estado = this.estadoSeleccionado.Nombre;
+
+
+        },
+        cambioPerfil() {
+            // this.editedUsuario.idPerfil = this.perfilSeleccionado.idPerfil;
+            // this.editedUsuario.Perfil = this.perfilSeleccionado.Nombre;
+            // this.nuevoUsuario.idPerfil = this.perfilSeleccionado.idPerfil;
+            // this.nuevoUsuario.Perfil = this.perfilSeleccionado.Nombre;
+
+        },
+        print() {
+
             this.editedUsuario.idEstado = this.estadoSeleccionado.idEstado;
+            this.editedUsuario.Estado = this.estadoSeleccionado.Nombre;
 
-            this.editedUsuario.Perfil = this.estadoSeleccionado.Nombre;
+            this.editedUsuario.idPerfil = this.perfilSeleccionado.idPerfil;
+            this.editedUsuario.Perfil = this.perfilSeleccionado.Nombre;
+            console.log(this.editedUsuario)
 
-            console.log(this.estadoSeleccionado.idEstado);  // Imprime solo el idEstado
+
         }
     },
     computed: {
-        formattedDate() {
+
+        formatDate() {
             return (usuario) => {
-                const dateObject = new Date(usuario.UltimoIngreso);
-                return `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
+                const date = new Date(usuario.UltimoIngreso);
+                const options = {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false // formato de hora en 24h
+                };
+                return date.toLocaleString('es-ES', options);
             };
+
         },
+
     },
     mounted() {
         this.getEstadosUsuarios();
