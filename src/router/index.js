@@ -5,6 +5,7 @@ import PagarProducto from '../components/PagarProducto.vue'
 import GestionarStock from '../views/admin/GestionarStock.vue'
 import GestionarUsuarios from '../views/admin/GestionarUsuarios.vue'
 import GestionarRoles from '../views/admin/GestionarRoles.vue'
+import GestionarCategorias from '../views/admin/GestionarCategorias.vue'
 import PantallaLogin from '../views/PantallaLogin.vue'
 
 const routes = [
@@ -32,6 +33,9 @@ const routes = [
   , {
     path: '/gestionarUsuarios',
     component: GestionarUsuarios
+  }, {
+    path: '/gestionarCategorias',
+    component: GestionarCategorias
   }
   , {
     path: '/gestionarRoles',
