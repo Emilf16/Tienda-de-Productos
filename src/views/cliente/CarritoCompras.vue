@@ -82,7 +82,7 @@
             </v-col>
             <v-col cols="12" lg="4" md="6">
                 <v-btn color="#F7BB44" @click="clearCart" style="margin-top: 10%; margin-left: 61%; margin-bottom: 9%;">
-                    <span style="font-weight: bold; color: white;">Vacear Carro</span>
+                    <span style="font-weight: bold; color: white;">Limpiar Carrito</span>
                 </v-btn>
                 <v-sheet color="#F0FCFF" elevation="0" class="pa-6 " style="margin-left: 6%; margin-right: 4%;">
                     <v-card-title class="align-center">
