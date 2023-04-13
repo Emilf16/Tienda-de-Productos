@@ -5,37 +5,53 @@
             <router-link to="/"
                 style="text-decoration: none; color: inherit;"><v-toolbar-title>Tienda</v-toolbar-title></router-link>
             <v-spacer> </v-spacer>
-            <v-btn class="mx-3">
+            <v-btn :ripple="false" variant="text" class="text-none" stacked>
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;">
-                    <v-badge :content="0" floating>
-                        <div class="d-flex align-center">
-                            <span>Carrito</span>
-                            <v-icon size="large" class="ml-2" icon="mdi-cart-outline"></v-icon>
-                        </div>
+                    <v-badge :content="0">
+                        <v-icon size="large" icon="mdi-cart-outline"></v-icon>
                     </v-badge>
                 </router-link>
+                <v-tooltip
+                    activator="parent"
+                    location="bottom"
+                >Mi carrito</v-tooltip>
             </v-btn>
-            <v-divider vertical></v-divider>
-            <v-menu class="mx-3" open-on-hover>
+            <v-menu :close-on-content-click="false">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" class="mx-3">
-                        <v-avatar size="x-small" class="mr-2"
-                            image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"></v-avatar>
-                        <span>Username</span>
-                        <v-icon>mdi-chevron-down</v-icon>
+                    <v-btn v-bind="props" :ripple="false" variant="text" stacked>
+                        <v-avatar size="x-small"
+                            image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" class="mx-1"></v-avatar>
+                        <v-tooltip
+                            activator="parent"
+                            location="bottom"
+                        >Mi cuenta</v-tooltip>
                     </v-btn>
                 </template>
+                <v-list
+                    border
+                    class="mx-auto"
+                    max-width="256"
+                >
+                    <v-list-item
+                        link :to="{ name: 'MiPerfil' }"
+                        prepend-icon="mdi-account-outline"
+                        title="Mi perfil"
+                    >
+                    </v-list-item>
 
-                <v-list class="text-center">
-                    <v-list-item>
-                        <v-btn variant="text">Mi perfil</v-btn>
-                    </v-list-item>
-                    <v-list-item>
-                        <v-btn variant="text">Mis ordenes</v-btn>
-                    </v-list-item>
+                    <v-list-item
+                        link
+                        prepend-icon="mdi-package-variant-closed"
+                        title="Mis pedidos"
+                    ></v-list-item>
+
                     <v-divider></v-divider>
-                    <v-list-item>
-                        <v-btn variant="text" @click="logOut">Cerrar sesión</v-btn>
+
+                    <v-list-item class="text-center">
+                        <v-btn style="width: 100%; margin: 10px 0px 5px 0px" color="warning" variant="outlined" @click="logOut">
+                            <v-icon style="margin: 0px 5px">mdi-logout</v-icon>
+                            Cerrar sesión
+                        </v-btn>
                     </v-list-item>
                 </v-list>
             </v-menu>
@@ -70,7 +86,7 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-main style="background-color: white;">
+        <v-main style="background-color: #f3f3f3;">
             <router-view />
         </v-main>
         <!---->
@@ -106,6 +122,19 @@
     </v-app>
 </template>
 
+<style>
+.profileBtn {
+    margin: 0 35px 0 10px !important;
+    @media screen and (max-width:1024px){
+        margin: 0 25px 0 10px !important;
+    }
+    @media screen and (max-width:600px){
+        margin: 0 15px 0 10px !important;
+    }
+}
+
+</style>
+
 <script>
 import axios from 'axios'
 
@@ -134,7 +163,7 @@ export default {
                 const token = localStorage.getItem('token');
                 const response = await axios.put('https://tiendabackend.azurewebsites.net/api/Account', {}, {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization: `${token}`
                     }
                 });
                 // Borrar el token de autorización del almacenamiento local

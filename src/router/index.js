@@ -6,40 +6,76 @@ import GestionarStock from '../views/admin/GestionarStock.vue'
 import GestionarUsuarios from '../views/admin/GestionarUsuarios.vue'
 import GestionarRoles from '../views/admin/GestionarRoles.vue'
 import GestionarCategorias from '../views/admin/GestionarCategorias.vue'
+import MiPerfil from '../views/cliente/MiPerfil.vue'
 import PantallaLogin from '../views/PantallaLogin.vue'
 
 const routes = [
 
   {
     path: '/pantallaLogin',
+    name: 'Login',
     component: PantallaLogin
   },
   {
     path: '/',
+    name: 'Home',
     component: PantallaProductos
   },
   {
     path: '/carritoCompras',
-    component: CarritoCompras
+    name: 'Carrito',
+    component: CarritoCompras,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/pagarProducto',
-    component: PagarProducto
+    name: 'Pagar',
+    component: PagarProducto,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/gestionarStock',
-    component: GestionarStock
-  }
-  , {
+    name: 'GestionarStock',
+    component: GestionarStock,
+    meta: {
+      requiresAuth: true
+    }
+  }, 
+  {
     path: '/gestionarUsuarios',
-    component: GestionarUsuarios
-  }, {
+    name: 'GestionarUsuarios',
+    component: GestionarUsuarios,
+    meta: {
+      requiresAuth: true
+    }
+  }, 
+  {
     path: '/gestionarCategorias',
-    component: GestionarCategorias
-  }
-  , {
+    name: 'GestionarCategorias',
+    component: GestionarCategorias,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/gestionarRoles',
-    component: GestionarRoles
+    name: 'GestionarRoles',
+    component: GestionarRoles,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/MiPerfil',
+    name: 'MiPerfil',
+    component: MiPerfil,
+    meta: {
+      requiresAuth: true
+    }
   }
 
 ]
@@ -48,6 +84,22 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = localStorage.getItem("token");
+
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!isLoggedIn) {
+      // MI BRO METE UNA LOGICA AQUI PA MANDARLO PAL LOGIN
+      // next('/pantallaLogin');
+      next();
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
 
 
 export default router
