@@ -91,12 +91,12 @@
                         <div class="w-100 d-flex flex-row bd-highlight">
                             <v-text-field autocomplete="off" label="Nombres" name="Nombres" v-model="user.Nombres" :rules="nameRules"
                             required class="formPerfil"
-                            v-bind:class="{ 'form-control': true, 'is-invalid': !validName(name) }"
+                            v-bind:class="{ 'form-control': true }"
                             variant="outlined"></v-text-field>
 
                             <v-text-field autocomplete="off" label="Apellidos" name="Apellidos" v-model="user.Apellidos" :rules="nameRules"
                             required class="formPerfil"
-                            v-bind:class="{ 'form-control': true, 'is-invalid': !validName(name) }"
+                            v-bind:class="{ 'form-control': true }"
                             variant="outlined"></v-text-field>
                         </div>
                         <v-text-field autocomplete="off" label="Correo electrónico" name="email" type="email" variant="outlined"
@@ -130,7 +130,7 @@
                                 color="warning"
                                 variant="flat"
                                 height="55"
-                                @click="load"
+                                @click="submitForm"
                             >
                                 Guardar cambios
                                 <v-tooltip
@@ -166,8 +166,8 @@ import axios from 'axios'
             return { toast }
         },
 
+
         data() {
-            
             return {
                 imageUrl: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
                 showEditIcon: false,
@@ -184,6 +184,7 @@ import axios from 'axios'
                 confirmPassword: "",
                 telefono: "",
                 loading: false,
+                loaded: false,
                 emailRules: [
                     (v) => !!v || "El correo electrónico es requerido",
                     (v) => /.+@.+\..+/.test(v) || "El correo electrónico debe ser válido",
@@ -205,40 +206,56 @@ import axios from 'axios'
                 rail: true,
                 reveal: false,
                 isLoggedIn: false,
+                cambiosRealizados: false,
+                token: localStorage.getItem('token')
+            }
+        },
+        watch: {
+            user: {
+                handler: function(nuevoValor, antiguoValor) {
+                    console.log(JSON.stringify(nuevoValor) !== JSON.stringify(antiguoValor));
+                    if (JSON.stringify(nuevoValor) !== JSON.stringify(antiguoValor)) {
+                        this.cambiosRealizados = true;
+                    } else {
+                        this.cambiosRealizados = false;
+                    }
+                },
+                deep: true
             }
         },
         mounted() {
-            const token = localStorage.getItem('token');
-            console.log(token);
-            axios.get('https://tiendabackend.azurewebsites.net/api/Account', {
-                headers: {
-                    'Authorization': `${token}`
-                }
-            })
-            .then(data => {
-                this.user = data.data.usuario;
-                this.userVerification = data.data.usuario;
-                console.log(data.data);
-            })
-            .catch(error => {
-                this.toast.error("Error 500. " + error, {
-                timeout: 3000,
-                closeOnClick: true,
-                pauseOnFocusLoss: false,
-                pauseOnHover: false,
-                draggable: true,
-                draggablePercent: 0.6,
-                showCloseButtonOnHover: true,
-                hideProgressBar: true,
-                closeButton: "button",
-                icon: true,
-                rtl: false
+            if (!this.loaded) {
+                axios.get('https://tiendabackend.azurewebsites.net/api/Account', {
+                    headers: {
+                        'Authorization': `${this.token}`
+                    }
+                })
+                .then(data => {
+                    this.user = data.data.usuario;
+                    this.userVerification = data.data.usuario;
+                    console.log(data.data);
+                    this.loaded = true;
+                })
+                .catch(error => {
+                    this.toast.error("Error 500. " + error, {
+                    timeout: 3000,
+                    closeOnClick: true,
+                    pauseOnFocusLoss: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    draggablePercent: 0.6,
+                    showCloseButtonOnHover: true,
+                    hideProgressBar: true,
+                    closeButton: "button",
+                    icon: true,
+                    rtl: false
+                    });
                 });
-            });
+            }
         },
         methods: {
             uploadImage() {
-            this.$refs.fileInput.click(); // abrir el input file al hacer clic en el avatar
+                this.$refs.fileInput.click(); // abrir el input file al hacer clic en el avatar
             },
             handleImageUpload(event) {
                 try {
@@ -284,33 +301,112 @@ import axios from 'axios'
             validate() {
                 this.emailBlured = true;
                 this.passwordBlured = true;
-                if (this.validName(this.name) && this.validPassword(this.password) && this.validEmail(this.email) && this.validConfirmPassword(this.confirmPassword)) {
+                if (this.validPassword(this.password) && this.validEmail(this.user.CorreoElectronico) && this.validConfirmPassword(this.confirmPassword)) {
                     this.valid = true;
                 }
             },
             validEmail(email) {
                 var re = /(.+)@(.+){2,}\.(.+){2,}/;
                 if (re.test(email.toLowerCase())) {
-
                     return true;
                 }
             },
             validConfirmPassword(confirmPassword) {
+                if ((confirmPassword == null || confirmPassword == "") && (this.password == null || this.password == "")){
+                    return true;
+                }
+
                 if (confirmPassword.length > 7 && confirmPassword == this.password) {
                     return true;
                 }
             },
             validPassword(password) {
+                if ((this.confirmPassword == null || this.confirmPassword == "") && (this.password == null || this.password == "")){
+                    return true;
+                }
                 if (password.length > 7) {
                     return true;
                 }
             },
-            validName(name) {
-                if (name.length >= 3) {
-                    return true;
+            submitForm() {
+                this.validate();
+
+                if (this.valid) {
+                    if (this.cambiosRealizados) {
+                        this.toast.warning("No hay nuevos cambios.", {
+                                timeout: 3000,
+                                closeOnClick: true,
+                                pauseOnFocusLoss: false,
+                                pauseOnHover: false,
+                                draggable: true,
+                                draggablePercent: 0.6,
+                                showCloseButtonOnHover: true,
+                                hideProgressBar: true,
+                                closeButton: "button",
+                                icon: true,
+                                rtl: false
+                            });
+                    }
+                    else {
+                        console.log('https://tiendabackend.azurewebsites.net/api/Usuarios/' + this.user.idUsuario);
+                        axios.put('https://tiendabackend.azurewebsites.net/api/Usuarios/' + this.user.idUsuario, this.user, {
+                            headers: {
+                                'Authorization': `${this.token}`
+                            }
+                        })
+                        .then(data => {
+                            console.log(data);
+                            if (data.data.Success) {
+                                this.loading = false;
+                                this.toast.success(data.data.Message, {
+                                    timeout: 3000,
+                                    closeOnClick: true,
+                                    pauseOnFocusLoss: false,
+                                    pauseOnHover: false,
+                                    draggable: true,
+                                    draggablePercent: 0.6,
+                                    showCloseButtonOnHover: true,
+                                    hideProgressBar: true,
+                                    closeButton: "button",
+                                    icon: true,
+                                    rtl: false
+                                });
+                            }
+                            else {
+                                this.loading = false;
+                                this.toast.warning(data.data.Message, {
+                                    timeout: 3000,
+                                    closeOnClick: true,
+                                    pauseOnFocusLoss: false,
+                                    pauseOnHover: false,
+                                    draggable: true,
+                                    draggablePercent: 0.6,
+                                    showCloseButtonOnHover: true,
+                                    hideProgressBar: true,
+                                    closeButton: "button",
+                                    icon: true,
+                                    rtl: false
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            this.toast.error("Error 500. " + error, {
+                            timeout: 3000,
+                            closeOnClick: true,
+                            pauseOnFocusLoss: false,
+                            pauseOnHover: false,
+                            draggable: true,
+                            draggablePercent: 0.6,
+                            showCloseButtonOnHover: true,
+                            hideProgressBar: true,
+                            closeButton: "button",
+                            icon: true,
+                            rtl: false
+                            });
+                        }); 
+                    }
                 }
             },
         },
-
     }
 </script>
