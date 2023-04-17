@@ -125,12 +125,6 @@
 <style>
 .profileBtn {
     margin: 0 35px 0 10px !important;
-    @media screen and (max-width:1024px){
-        margin: 0 25px 0 10px !important;
-    }
-    @media screen and (max-width:600px){
-        margin: 0 15px 0 10px !important;
-    }
 }
 
 </style>
