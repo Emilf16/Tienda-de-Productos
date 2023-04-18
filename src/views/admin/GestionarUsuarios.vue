@@ -25,7 +25,11 @@
                                 <td>{{ usuario.CorreoElectronico }}</td>
                                 <td>{{ usuario.Perfil }}</td>
                                 <td>{{ formatDate(usuario) }}</td>
-                                <td>{{ usuario.Estado }}</td>
+                                <td>
+                                    <v-chip :color="getEstadoColor(usuario.Estado)" :outlined="true" small>
+                                        {{ usuario.Estado }}
+                                    </v-chip>
+                                </td>
                                 <td> <v-icon @click="editUsuario(usuario)">mdi-pencil</v-icon></td>
                             </tr>
                         </tbody>
@@ -437,7 +441,22 @@ export default {
             console.log(this.editedUsuario)
 
 
-        }
+        },
+        getEstadoColor(estado) {
+            console.log(estado);
+            switch (estado) {
+                case 'Activo':
+                return 'success';
+                case 'Inactivo':
+                return 'primary';
+                case 'Suspendido':
+                return 'default';
+                case 'Baneado':
+                return 'error';
+                default:
+                return '';
+            }
+        },
     },
     computed: {
 

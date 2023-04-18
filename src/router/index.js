@@ -7,6 +7,7 @@ import GestionarUsuarios from '../views/admin/GestionarUsuarios.vue'
 import GestionarRoles from '../views/admin/GestionarRoles.vue'
 import GestionarCategorias from '../views/admin/GestionarCategorias.vue'
 import MiPerfil from '../views/cliente/MiPerfil.vue'
+import MisPedidos from '../views/cliente/MisPedidos.vue'
 import PantallaLogin from '../views/PantallaLogin.vue'
 
 const routes = [
@@ -73,6 +74,14 @@ const routes = [
     path: '/MiPerfil',
     name: 'MiPerfil',
     component: MiPerfil,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/Pedidos',
+    name: 'MisPedidos',
+    component: MisPedidos,
     meta: {
       requiresAuth: true
     }
