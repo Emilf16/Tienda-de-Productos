@@ -12,10 +12,8 @@ import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from 'primevue/api';
 import "vue-easytable/libs/theme-default/index.css"; // import style
 import VueEasytable from "vue-easytable"; // import library
-
-
-
-
+import VueCreditCardValidation from 'vue-credit-card-validation';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 loadFonts()
 
@@ -25,7 +23,7 @@ const store = createStore({
       productosCarrito: [],
       estaLogueado: false,
       userName: "",
-      defaultToastProperties: {
+      defaultToastOptions: {
         timeout: 3000,
         closeOnClick: true,
         pauseOnFocusLoss: false,
@@ -64,9 +62,11 @@ createApp(App)
   .use(FilterMatchMode)
   .use(PrimeVue)
   .use(VueEasytable)
+  .use(VueCreditCardValidation)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
     maxToasts: 20,
     newestOnTop: true
   })
+  .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app')
