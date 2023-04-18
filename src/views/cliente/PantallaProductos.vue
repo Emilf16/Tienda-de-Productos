@@ -257,12 +257,14 @@ export default {
 
     async agregarAlCarrito(produto) {
       const token = localStorage.getItem("token");
+
       const url = `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${
         produto.idProducto
       }&cantidad=${1}&precioPorProducto=${0}`;
 
       try {
         const response = await api.post(url);
+
         // Obtener el token de la respuesta y guardarlo en el almacenamiento local
         if (response.data.Success) {
           this.toast.success(response.data.Message, {
