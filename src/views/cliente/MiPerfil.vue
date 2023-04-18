@@ -321,23 +321,20 @@
                             <v-row>
                                 <v-col cols="12" sm="6">
                                     <v-text-field
-                                        label="Card Number"
-                                        v-model="cardNumber"
+                                        label="Número de tarjeta"
+                                        v-model="newMetodo.Numero"
                                         :rules="[rules.required, rules.cardNumber]"
                                         variant="outlined"
                                         v-cardformat:formatCardNumber
                                     >
                                         <template v-slot:prepend>
-                                            <i :class="cardBrandClass"></i>
-                                            <i class="fa fa-credit-card"></i>
-                                            <v-icon icon="fas fa-credit-card" /> 
-                                            <font-awesome-icon :icon="['fas', 'credit-card']" />
+                                            <v-icon>mdi-credit-card-outline</v-icon>
                                         </template>
                                     </v-text-field>
                                 </v-col>
                                 <v-col cols="12" sm="6">
                                 <v-text-field
-                                    label="Cardholder Name"
+                                    label="Nombre en la tarjeta"
                                     v-model="cardholderName"
                                     :rules="[rules.required, rules.name]"
                                     variant="outlined"
@@ -356,9 +353,9 @@
                                 >
                                     <template v-slot:activator="{ on, attrs }">
                                     <v-text-field
-                                        v-model="expDate"
-                                        label="Expiration Date"
-                                        append-icon="mdi-calendar"
+                                        v-model="newMetodo.FechaExpiracion"
+                                        label="Fecha de vencimiento"
+                                        prepend-icon="mdi-calendar"
                                         :rules="[rules.required, rules.expDate]"
                                         v-bind="attrs"
                                         v-on="on"
@@ -370,8 +367,8 @@
                                 </v-col>
                                 <v-col cols="12" sm="6">
                                 <v-text-field
-                                    label="CVV"
-                                    v-model="CVV"
+                                    label="Código de seguridad (CVV)"
+                                    v-model="newMetodo.CVV"
                                     :rules="[rules.required, rules.CVV]"
                                     variant="outlined"
                                     v-cardformat:formatCardCVC
@@ -450,7 +447,7 @@ export default {
                 Tipo: "",
                 Numero: "",
                 FechaExpiracion: "",
-                Pais: "",
+                CVV: "",
                 EsPrincipal: false,
             },
             direcciones: [],
@@ -565,17 +562,6 @@ export default {
           }
 
           return icon;
-        },
-        submit() {
-            if (this.valid) {
-                // send credit card data to server or process payment
-                this.$refs.form.reset();
-                this.cardNumber = "";
-                this.cardholderName = "";
-                this.expDate = null;
-                this.CVV = "";
-                this.expDateMenu = false;
-            }
         },
         loadUserDirecciones() {
             axios.get('https://tiendabackend.azurewebsites.net/api/Direcciones/GetDireccionesUsuario?idUsuario=' + this.user.idUsuario, {
@@ -802,6 +788,63 @@ export default {
         },
         deleteDireccion() {
 
+        },
+        async saveMetodo(){
+            const url = 'https://tiendabackend.azurewebsites.net/api/MetodosPagos';
+            this.newMetodo.idUsuario = this.user.idUsuario;
+            this.newMetodo.Tipo = this.cardBrand.charAt(0).toUpperCase() + this.cardBrand.slice(1);
+
+            const model = Object.assign({}, this.newMetodo);
+
+            try {
+                if (this.newMetodo.idMetodo == 0){
+                    this.loading = true;
+
+                    const response = await axios.post(url, this.newMetodo, {
+                        headers: {
+                            Authorization: `${this.token}`
+                        }
+                    });
+                    if (response.data.Success) {
+                        this.loading = false;
+                        this.loadUserMetodos();
+                        this.showMetodosDialog = false;
+
+                        this.toast.success(response.data.Message, this.$store.state.defaultToastOptions);
+                    }
+                    else {
+                        this.loading = false;
+                        console.log(response.data);
+                        this.toast.warning(response.data.Message, this.$store.state.defaultToastOptions);
+                    }
+                }
+                else {
+                    this.loading = true;
+                    console.log(model);
+                    const token = localStorage.getItem('token');
+
+                    const response = await axios.put(url + '?idMetodo=' + this.newMetodo.idMetodo, model, {
+                        headers: {
+                            Authorization: `${token}`
+                        }
+                    });
+                    if (response.data.Success) {
+                        this.loading = false;
+                        this.loadUserMetodos();
+                        this.showMetodosDialog = false;
+
+                        this.toast.success(response.data.Message, this.$store.state.defaultToastOptions);
+                    }
+                    else {
+                        this.loading = false;
+                        this.toast.warning(response.data.Message, this.$store.state.defaultToastOptions);
+                    }
+                }
+            } 
+            catch (error) {
+                this.loading = false;
+                this.toast.error("Error 500. Error al realizar la operación.", this.$store.state.defaultToastOptions);
+            }                
         },
     },
 }
