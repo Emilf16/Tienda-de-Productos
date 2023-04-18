@@ -1,187 +1,319 @@
 <template>
-    <v-carousel
-        cycle
-        height="400"
-        hide-delimiter-background
-        show-arrows="hover"
-        hide-delimiters
-    >
-        <v-carousel-item v-for="(category, index) in categoriesSlider" :key="index" >
-            <v-sheet height="100%" 
-                :style="'background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(' + category.image + ');' + 'background-position: center center; background-repeat: no-repeat; background-size: cover;'"
-                class="d-flex flex-column justify-center align-center"
+  <v-carousel
+    cycle
+    height="400"
+    hide-delimiter-background
+    show-arrows="hover"
+    hide-delimiters
+  >
+    <v-carousel-item v-for="(category, index) in categoriesSlider" :key="index">
+      <v-sheet
+        height="100%"
+        :style="
+          'background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(' +
+          category.image +
+          ');' +
+          'background-position: center center; background-repeat: no-repeat; background-size: cover;'
+        "
+        class="d-flex flex-column justify-center align-center"
+      >
+        <h2
+          class="text-h2 mb-2 text-white"
+          style="
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: bold;
+          "
+        >
+          {{ category.title }}
+        </h2>
+        <p
+          class="text-h5 mb-5 text-white"
+          style="font-family: 'Poppins', sans-serif !important"
+        >
+          {{ category.description }}
+        </p>
+        <v-btn
+          class="mx-auto my-2"
+          color="warning"
+          @click="viewCategory(category)"
+        >
+          Ver más
+        </v-btn>
+      </v-sheet>
+    </v-carousel-item>
+  </v-carousel>
+
+  <v-container fluid>
+    <v-row class="mx-4 my-4">
+      <v-col cols="12" class="py-2">
+        <v-card-title>Categorias</v-card-title>
+
+        <v-btn-toggle
+          v-model="text"
+          rounded="0"
+          color="deep-purple-accent-3"
+          group
+        >
+          <v-btn
+            v-for="categoria in listaCategorias"
+            v-bind:key="categoria.idCategoria"
+            v-bind:categoria="categoria"
+            v-model="categoria.idCategoria"
+            rounded="0"
+            color="yellow-accent-4"
+            group
+            @click="filtrarProductos(categoria.idCategoria)"
+            >{{ categoria.Nombre }}
+          </v-btn>
+        </v-btn-toggle>
+      </v-col>
+
+      <v-col
+        v-for="producto in listaProductoFiltros"
+        v-bind:key="producto.idProducto"
+        v-bind:producto="producto"
+        cols="12"
+        lg="3"
+        md="4"
+        sm="6"
+        xs="12"
+      >
+        <v-card class="mx-auto my-2" max-width="auto" elevation="6">
+          <v-img
+            :src="producto.Imagen"
+            :alt="producto.Nombre"
+            height="200px"
+            contain
+          ></v-img>
+          <v-card-title>{{ producto.Nombre }}</v-card-title>
+          <v-card-subtitle>
+            <span class="me-1">{{ producto.Precio }}</span>
+            <v-icon color="error" icon="mdi-fire-circle" size="small"></v-icon>
+          </v-card-subtitle>
+          <v-card-text>
+            <v-row align="center" class="mx-0">
+              <v-rating
+                :model-value="producto.Valoracion"
+                color="amber"
+                density="compact"
+                half-increments
+                readonly
+                size="small"
+              ></v-rating>
+              <div class="text-grey ms-4">{{ producto.Valoracion }}</div>
+            </v-row>
+          </v-card-text>
+          <v-textarea
+            style="background-color: white"
+            v-model="producto.Descripcion"
+            variant="filled"
+            auto-grow
+            label="Descripción"
+            rows="5"
+            row-height="30"
+            shaped
+          ></v-textarea>
+          <v-divider class="mx-4 mb-1"></v-divider>
+          <v-card-title>En Stock</v-card-title>
+          <v-card-actions class="d-flex" style="justify-content: space-between">
+            <v-btn color="#090C29" variant="flat" text class="flex-grow-1 ml-2">
+              <span style="color: white; font-weight: bold">Ver</span>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="warning"
+              variant="flat"
+              class="flex-grow-4 mr-2"
+              @click="agregarAlCarrito(producto)"
             >
-                <h2 class="text-h2 mb-2 text-white" style="font-family: 'Poppins', sans-serif !important; font-weight: bold;">{{ category.title }}</h2>
-                <p class="text-h5 mb-5 text-white" style="font-family: 'Poppins', sans-serif !important">{{ category.description }}</p>
-                <v-btn class="mx-auto my-2" color="warning" @click="viewCategory(category)">
-                    Ver más
-                </v-btn>
-            </v-sheet>
-        </v-carousel-item>
-    </v-carousel>
-
-    <v-container fluid>
-        <v-row class="mx-4 my-4">
-            <v-col v-for="category in categories" v-bind:key="category.idCategory" v-bind:category="category" cols="12"
-                lg="3" md="4" sm="6" xs="12">
-
-                <v-card class="mx-auto my-2" max-width="auto" elevation="6">
-                    <v-img height="200px" contain v-bind:src="category.strCategoryThumb"
-                        v-bind:alt="category.strCategory"></v-img>
-                    <v-card-item>
-                        <v-card-title>{{ category.strCategory }}</v-card-title>
-
-                        <v-card-subtitle>
-                            <span class="me-1">US$29.99</span>
-
-                            <v-icon color="error" icon="mdi-fire-circle" size="small"></v-icon>
-                        </v-card-subtitle>
-                    </v-card-item>
-
-                    <v-card-text>
-                        <v-row align="center" class="mx-0">
-                            <v-rating :model-value="4.5" color="amber" density="compact" half-increments readonly
-                                size="small"></v-rating>
-
-                            <div class="text-grey ms-4">
-                                4.5 (413)
-                            </div>
-                        </v-row>
-
-                        <div class=" mt-5" color="#000000"
-                            style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal;">
-                            {{ category.strCategoryDescription }}
-                        </div>
-                    </v-card-text>
-                    <v-divider class="mx-4 mb-1"></v-divider>
-                    <v-card-title>En Stock</v-card-title>
-
-                    <v-card-actions class=" d-flex" style="justify-content: space-between;">
-                        <v-btn color="#090C29" variant="flat" text class="flex-grow-1 ml-2">
-                            <span style="color: white; font-weight: bold;">
-                                ver
-                            </span>
-                        </v-btn>
-                        <v-spacer></v-spacer>
-                        <v-btn color="warning" variant="flat" class="flex-grow-4 mr-2"
-                            @click="agregarNuevoProducto(category)">
-                            <span style="color: white; font-weight: bold;">
-                                + Agregar al carrito
-                            </span>
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-
-
-            </v-col>
-        </v-row>
-
-    </v-container>
+              <span style="color: white; font-weight: bold"
+                >+ Agregar al carrito</span
+              >
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
+import api from "../../utilities/api";
 
 export default {
+  data() {
+    return {
+      checkoutModal: false,
+      productosCarrito: [],
+      categories: [],
 
-    data() {
-        return {
-            checkoutModal: false,
-            productosCarrito: [],
-            categories: [],
-            meals: [],
-            search: null,
-            current: 1,
-            pageSize: 5, rating: 3, loading: false,
-            selection: 1,
-            colors: [
-            'indigo',
-            'warning',
-            'pink darken-2',
-            'red lighten-1',
-            'deep-purple accent-4',
-            ],
-            slides: [
-            'First',
-            'Second',
-            'Third',
-            'Fourth',
-            'Fifth',
-            ],
+      listaCategorias: [],
+      listaProductos: [],
+      listaProductoFiltros: [],
+      meals: [],
+      text: "center",
+      icon: "justify",
+      toggle_none: null,
+      toggle_one: 0,
+      toggle_exclusive: 2,
+      toggle_multiple: [0, 1, 2],
+      search: null,
+      current: 1,
+      pageSize: 5,
+      rating: 3,
+      loading: false,
+      selection: 1,
+      colors: [
+        "indigo",
+        "warning",
+        "pink darken-2",
+        "red lighten-1",
+        "deep-purple accent-4",
+      ],
+      slides: ["First", "Second", "Third", "Fourth", "Fifth"],
 
-            categoriesSlider: [
-                {
-                    title: "Ropa",
-                    description: "Vestido de verano para mujer de color rojo.",
-                    image: "https://cdn.stocksnap.io/img-thumbs/960w/clothes-store_Q2WKRAM2O4.jpg",
-                },
-                {
-                    title: "Tecnología",
-                    description: "Vestido de versdfde color rojo.",
-                    image: "https://cdn.stocksnap.io/img-thumbs/960w/computer-keyboard_IHIHTFK8YH.jpg",
-                },
-                {
-                    title: "Hogar",
-                    description: "Vsdfo.",
-                    image: "https://cdn.stocksnap.io/img-thumbs/960w/bed-bedroom_UJCTKDCTXC.jpg",
-                },
-                {
-                    title: "Libros",
-                    description: "Vestido de sdf rojo.",
-                    image: "https://cdn.stocksnap.io/img-thumbs/960w/developer-books_KAUFJW1PEQ.jpg",
-                },
-            ],
+      categoriesSlider: [
+        {
+          title: "Ropa",
+          description: "Vestido de verano para mujer de color rojo.",
+          image:
+            "https://cdn.stocksnap.io/img-thumbs/960w/clothes-store_Q2WKRAM2O4.jpg",
+        },
+        {
+          title: "Tecnología",
+          description: "Vestido de versdfde color rojo.",
+          image:
+            "https://cdn.stocksnap.io/img-thumbs/960w/computer-keyboard_IHIHTFK8YH.jpg",
+        },
+        {
+          title: "Hogar",
+          description: "Vsdfo.",
+          image:
+            "https://cdn.stocksnap.io/img-thumbs/960w/bed-bedroom_UJCTKDCTXC.jpg",
+        },
+        {
+          title: "Libros",
+          description: "Vestido de sdf rojo.",
+          image:
+            "https://cdn.stocksnap.io/img-thumbs/960w/developer-books_KAUFJW1PEQ.jpg",
+        },
+      ],
+    };
+  },
+  mounted() {
+    this.getCategorias();
+    this.getProductos();
+    this.filtrarProductos();
+  },
+  methods: {
+    filtrarProductos(IdCategoria) {
+      console.log(IdCategoria);
+      if (IdCategoria == null) {
+        this.listaProductoFiltros = this.listaProductos;
+      }
+
+      this.listaProductoFiltros = this.listaProductos.filter((producto) =>
+        producto.Categorias.some(
+          (categoria) => categoria.idCategoria === IdCategoria
+        )
+      );
+    },
+    async getCategorias() {
+      try {
+        const url =
+          "https://tiendabackend.azurewebsites.net/api/Productos/GetCategorias";
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+        this.listaCategorias = response.data;
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+    async getProductos() {
+      try {
+        const url = "https://tiendabackend.azurewebsites.net/api/Productos";
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+        this.listaProductos = response.data;
+        this.listaProductoFiltros = response.data;
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+
+    async agregarAlCarrito(produto) {
+      const token = localStorage.getItem("token");
+
+      const url = `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${
+        produto.idProducto
+      }&cantidad=${1}&precioPorProducto=${0}`;
+
+      try {
+        const response = await api.post(url);
+
+        // Obtener el token de la respuesta y guardarlo en el almacenamiento local
+        if (response.data.Success) {
+          this.toast.success(response.data.Message, {
+            timeout: 3000,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            pauseOnHover: false,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: true,
+            rtl: false,
+          });
+        } else {
+          this.toast.warning(response.data.Message, {
+            timeout: 3000,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            pauseOnHover: false,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: true,
+            rtl: false,
+          });
         }
+      } catch (error) {
+        console.error("Error:", error);
+      }
     },
-    mounted() {
-        axios.get('https://www.themealdb.com/api/json/v1/1/categories.php')
-            .then((res) => {
-                //idCategory
-                //strCategory
-                //strCategoryDescription
-                //strCategoryThumb
-                this.categories = res.data.categories;
-            }).catch((err) => {
-                console.log(err);
-            })
+
+    agregarNuevoProducto(producto) {
+      this.$store.commit("agregarNuevoProducto", producto);
+      console.log(this.$store.state.productosCarrito);
     },
-    methods: {
-        agregarNuevoProducto(producto) {
-            this.$store.commit('agregarNuevoProducto', producto)
-            console.log(this.$store.state.productosCarrito)
 
-        },
-
-
-        searchData() {
-            //verificar si el campo de busquea tiene texto
-            if (this.search) {
-                axios.get('https://www.themealdb.com/api/json/v1/1/search.php?s=' + this.search)
-                    .then((res) => {
-                        this.meals = res.data.meals;
-
-
-                    }).catch((err) => {
-                        console.log(err);
-
-                    })
-            } else {
-
-                return;
-
-            }
-        }, showPaymentModal() {
-            this.checkoutModal = true;
-        },
-        reserve() {
-            this.loading = true
-
-            setTimeout(() => (this.loading = false), 2000)
-        },
-
+    showPaymentModal() {
+      this.checkoutModal = true;
     },
-    computed: {
+    reserve() {
+      this.loading = true;
 
-    }
-}
+      setTimeout(() => (this.loading = false), 2000);
+    },
+  },
+  computed: {},
+};
 </script>

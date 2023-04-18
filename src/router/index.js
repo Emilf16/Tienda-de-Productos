@@ -1,3 +1,4 @@
+ 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import PantallaProductos from '../views/cliente/PantallaProductos.vue'
 import CarritoCompras from '../views/cliente/CarritoCompras.vue'
@@ -9,10 +10,11 @@ import GestionarCategorias from '../views/admin/GestionarCategorias.vue'
 import MiPerfil from '../views/cliente/MiPerfil.vue'
 import MisPedidos from '../views/cliente/MisPedidos.vue'
 import PantallaLogin from '../views/PantallaLogin.vue'
+ 
 
 const routes = [
-
   {
+ 
     path: '/pantallaLogin',
     name: 'Login',
     component: PantallaLogin
@@ -109,6 +111,6 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+ 
 
-
-export default router
+export default router;

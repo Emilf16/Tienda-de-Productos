@@ -64,9 +64,15 @@
                 <!-- buscar productos -->
                 <router-link to="/" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-view-dashboard" title="Productos" value="productos"></v-list-item></router-link>
-                <!-- ver carrito -->
+
+                         <!-- ver carrito -->
                 <router-link to="/carritoCompras" style="text-decoration: none; color: inherit;"><v-list-item
-                        prepend-icon="mdi-cart-outline" title="Carrito" value="carrito"></v-list-item></router-link>
+                    prepend-icon="mdi-cart-outline" title="Carrito" value="carrito"></v-list-item></router-link>
+
+                <!-- Categorias -->
+                <router-link to="/pantallaCategorias" style="text-decoration: none; color: inherit;"><v-list-item
+                        prepend-icon="mdi-shopping" title="Categorias" value="categoria"></v-list-item></router-link>
+
                 <!-- gestionar productos -->
                 <router-link to="/gestionarStock" style="text-decoration: none; color: inherit;"><v-list-item
                         prepend-icon="mdi-cart-arrow-down" title="Gestionar Stock"
