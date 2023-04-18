@@ -10,6 +10,9 @@ import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from 'primevue/api';
+import "vue-easytable/libs/theme-default/index.css"; // import style
+import VueEasytable from "vue-easytable"; // import library
+
 
 
 
@@ -22,6 +25,19 @@ const store = createStore({
       productosCarrito: [],
       estaLogueado: false,
       userName: "",
+      defaultToastProperties: {
+        timeout: 3000,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+        draggable: true,
+        draggablePercent: 0.6,
+        showCloseButtonOnHover: true,
+        hideProgressBar: true,
+        closeButton: "button",
+        icon: true,
+        rtl: false
+      },
     }
   },
   mutations: {
@@ -47,6 +63,7 @@ createApp(App)
   .use(store)
   .use(FilterMatchMode)
   .use(PrimeVue)
+  .use(VueEasytable)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
     maxToasts: 20,

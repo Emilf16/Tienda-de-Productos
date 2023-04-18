@@ -18,6 +18,7 @@
     "primevue": "^3.26.1",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
+    "vue-easytable": "^2.26.0",
     "vue-router": "^4.0.3",
     "vue-toastification": "^2.0.0-rc.5",
     "vuetify": "^3.0.0-beta.0",
