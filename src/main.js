@@ -10,9 +10,9 @@ import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from 'primevue/api';
-
-
-
+import "vue-easytable/libs/theme-default/index.css"; // import style
+import VueCreditCardValidation from 'vue-credit-card-validation';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 loadFonts()
 
@@ -22,6 +22,19 @@ const store = createStore({
       productosCarrito: [],
       estaLogueado: false,
       userName: "",
+      defaultToastOptions: {
+        timeout: 3000,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+        draggable: true,
+        draggablePercent: 0.6,
+        showCloseButtonOnHover: true,
+        hideProgressBar: true,
+        closeButton: "button",
+        icon: true,
+        rtl: false
+      },
     }
   },
   mutations: {
@@ -47,9 +60,11 @@ createApp(App)
   .use(store)
   .use(FilterMatchMode)
   .use(PrimeVue)
+  .use(VueCreditCardValidation)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
     maxToasts: 20,
     newestOnTop: true
   })
+  .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app')

@@ -11,12 +11,17 @@
                         <v-form v-if="tab === 0" ref="loginForm" v-model="valid">
                             <v-text-field autocomplete="off" label="Nombre de usuario" name="name" v-model="name" :rules="nameRules"
                                 required
-                                v-bind:class="{ 'form-control': true, 'is-invalid': !validName(name) }"></v-text-field>
+                                v-bind:class="{ 'form-control': true, 'is-invalid': !validName(name) }"
+                                variant="outlined"></v-text-field>
 
 
-                            <v-text-field autocomplete="off" label="Contraseña" name="password" type="password"
+                            <v-text-field autocomplete="off" label="Contraseña" name="password"
+                                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                                 v-model="password" :rules="passwordRules" required
-                                v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }">
+                                v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }"
+                                :type="showPassword ? 'text' : 'password'"
+                                @click:append="showPassword = !showPassword"
+                                variant="outlined">
                             </v-text-field>
                             <div class="w-100 d-flex flex-row-reverse bd-highlight">
                                 <a class="forgot-password-link">¿Has olvidado la contraseña?</a>
@@ -25,24 +30,32 @@
 
                         <v-form v-else ref="registerForm" v-model="valid">
 
-                            <v-text-field autocomplete="off" label="Nombre" name="name" v-model="name" :rules="nameRules"
+                            <v-text-field autocomplete="off" label="Nombre" name="name" v-model="name" :rules="nameRules" variant="outlined"
                                 required></v-text-field>
 
-                            <v-text-field autocomplete="off" label="Correo electrónico" name="email" type="email"
+                            <v-text-field autocomplete="off" label="Correo electrónico" name="email" type="email" variant="outlined"
                                 v-model="email" :rules="emailRules" required
                                 v-bind:class="{ 'form-control': true, 'is-invalid': !validEmail(email) }"></v-text-field>
 
-                            <v-text-field autocomplete="off" label="Contraseña" name="password" type="password"
+                            <v-text-field autocomplete="off" label="Contraseña" name="password" variant="outlined"
                                 v-model="password" :rules="passwordRules" required
-                                v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }"></v-text-field>
+                                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                v-bind:class="{ 'form-control': true, 'is-invalid': !validPassword(password) }"
+                                :type="showPassword ? 'text' : 'password'"
+                                @click:append="showPassword = !showPassword">
+                            </v-text-field>
 
-                            <v-text-field autocomplete="off" label="Confirmar contraseña" name="confirmPassword"
-                                type="password" v-model="confirmPassword" :rules="confirmPasswordRules" required
-                                v-bind:class="{ 'form-control': true, 'is-invalid': !validConfirmPassword(confirmPassword) }"></v-text-field>
+                            <v-text-field autocomplete="off" label="Confirmar contraseña" name="confirmPassword" variant="outlined"
+                                :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                v-model="confirmPassword" :rules="confirmPasswordRules" required
+                                v-bind:class="{ 'form-control': true, 'is-invalid': !validConfirmPassword(confirmPassword) }"
+                                :type="showConfirmPassword ? 'text' : 'password'"
+                                @click:append="showConfirmPassword = !showConfirmPassword">
+                            </v-text-field>
                         </v-form>
                     </v-card-text>
                     <v-card-actions class="mx-auto">
-                        <v-btn color="warning" @click="submitForm" variant="flat" :disabled="loading" class="mx-auto">
+                        <v-btn color="warning" @click="submitForm" variant="flat" :loading="loading" class="mx-auto">
                             {{ tab === 0 ? 'Iniciar sesión' : 'Registrar' }}
                         </v-btn>
                     </v-card-actions>
@@ -90,6 +103,8 @@ export default {
             valid: false,
             email: "",
             password: "",
+            showPassword: false,
+            showConfirmPassword: false,
             name: "",
             confirmPassword: "",
             loading: false,
@@ -130,6 +145,7 @@ export default {
                 Nombres: this.name,
             };
             try {
+                this.loading = true;
                 const response = await axios.post(url, data);
                 // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
                 if (response.data.Success) {
@@ -169,7 +185,19 @@ export default {
                     });
                 }
             } catch (error) {
-                console.error('Error:', error);
+                this.toast.error("Error 500. Error al realizar la operación.", {
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
+                    });
             }
         },
         async ingresar() {
@@ -180,14 +208,15 @@ export default {
                 password: this.password
             };
             try {
+                this.loading = true;
                 const response = await axios.post(url, data);
                 // Obtener el token de la respuesta y guardarlo en el almacenamiento local 
                 if (response.data.Success) {
-                    this.loading = false;
                     localStorage.setItem('token', response.data.Token);
                     this.$store.commit('mostrarTienda', response.data.Token);
                     this.estaLogueado;
-
+                    
+                    this.loading = false;
                     this.toast.success(response.data.Message, {
                         timeout: 3000,
                         closeOnClick: true,
@@ -219,7 +248,19 @@ export default {
                     });
                 }
             } catch (error) {
-                console.error('Error:', error);
+                this.toast.error("Error 500. Error al realizar la operación.", {
+                        timeout: 3000,
+                        closeOnClick: true,
+                        pauseOnFocusLoss: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        draggablePercent: 0.6,
+                        showCloseButtonOnHover: true,
+                        hideProgressBar: true,
+                        closeButton: "button",
+                        icon: true,
+                        rtl: false
+                    });
             }
         },
 
@@ -253,8 +294,6 @@ export default {
             }
         },
         submitForm() {
-            this.loading = true;
-
             if (this.tab === 0) {
 
                 this.validate();
