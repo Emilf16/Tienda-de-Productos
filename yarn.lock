@@ -2807,6 +2807,11 @@ csstype@^3.1.0:
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
 
+de-indent@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.npmjs.org/de-indent/-/de-indent-1.0.2.tgz"
+  integrity sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==
+
 debug@^3.2.7:
   version "3.2.7"
   resolved "https://registry.npmjs.org/debug/-/debug-3.2.7.tgz"
@@ -6148,6 +6153,11 @@ vue-cli-plugin-vuetify@~2.5.8:
     semver "^7.1.2"
     shelljs "^0.8.3"
 
+vue-credit-card-validation@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npmjs.org/vue-credit-card-validation/-/vue-credit-card-validation-1.0.5.tgz"
+  integrity sha512-FtoIreB5H+MPzY54E087yt2XoH5D66mO5gTVZrBLbw6AT1gYfapv61kZdMKKQxD7IBzNZ+wfDDOG6rZVBGfHcg==
+
 vue-easytable@^2.26.0:
   version "2.26.0"
   resolved "https://registry.npmjs.org/vue-easytable/-/vue-easytable-2.26.0.tgz"
@@ -6157,10 +6167,6 @@ vue-easytable@^2.26.0:
     resize-observer-polyfill "^1.5.1"
     vue "^2.6.12"
     vue-template-compiler "^2.6.11"
-vue-credit-card-validation@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.npmjs.org/vue-credit-card-validation/-/vue-credit-card-validation-1.0.5.tgz"
-  integrity sha512-FtoIreB5H+MPzY54E087yt2XoH5D66mO5gTVZrBLbw6AT1gYfapv61kZdMKKQxD7IBzNZ+wfDDOG6rZVBGfHcg==
 
 vue-eslint-parser@^8.0.1:
   version "8.3.0"
@@ -6255,7 +6261,23 @@ vue@*, "vue@^2 || ^3.2.13", vue@^3.0.0, vue@^3.0.2, vue@^3.2.0, vue@^3.2.13, "vu
     "@vue/server-renderer" "3.2.47"
     "@vue/shared" "3.2.47"
 
+vue@^2.6.10:
+  version "2.7.14"
+  resolved "https://registry.npmjs.org/vue/-/vue-2.7.14.tgz"
+  integrity sha512-b2qkFyOM0kwqWFuQmgd4o+uHGU7T+2z3T+WQp8UBjADfEv2n4FEMffzBmCKNP0IGzOEEfYjvtcC62xaSKeQDrQ==
+  dependencies:
+    "@vue/compiler-sfc" "2.7.14"
+    csstype "^3.1.0"
+
 vue@^2.6.12:
+  version "2.7.14"
+  resolved "https://registry.npmjs.org/vue/-/vue-2.7.14.tgz"
+  integrity sha512-b2qkFyOM0kwqWFuQmgd4o+uHGU7T+2z3T+WQp8UBjADfEv2n4FEMffzBmCKNP0IGzOEEfYjvtcC62xaSKeQDrQ==
+  dependencies:
+    "@vue/compiler-sfc" "2.7.14"
+    csstype "^3.1.0"
+
+vue@^2.6.14:
   version "2.7.14"
   resolved "https://registry.npmjs.org/vue/-/vue-2.7.14.tgz"
   integrity sha512-b2qkFyOM0kwqWFuQmgd4o+uHGU7T+2z3T+WQp8UBjADfEv2n4FEMffzBmCKNP0IGzOEEfYjvtcC62xaSKeQDrQ==

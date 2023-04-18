@@ -11,7 +11,6 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from 'primevue/api';
 import "vue-easytable/libs/theme-default/index.css"; // import style
-import VueEasytable from "vue-easytable"; // import library
 import VueCreditCardValidation from 'vue-credit-card-validation';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -61,7 +60,6 @@ createApp(App)
   .use(store)
   .use(FilterMatchMode)
   .use(PrimeVue)
-  .use(VueEasytable)
   .use(VueCreditCardValidation)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
