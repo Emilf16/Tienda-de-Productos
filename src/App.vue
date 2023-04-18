@@ -21,14 +21,18 @@
 </template>
 
 <style>
+  @import 'primeicons/primeicons.css';
   * {
     font-family: 'Poppins', sans-serif !important;
   }
+  i.pi { font-family: PrimeIcons !important;  }
 </style>
 
 <script>
 import PantallaTienda from './views/PantallaTienda.vue'
 import PantallaLogin from './views/PantallaLogin.vue'
+import 'primeicons/primeicons.css';
+
 export default {
   components: {
     PantallaLogin,

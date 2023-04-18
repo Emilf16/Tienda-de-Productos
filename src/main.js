@@ -10,9 +10,14 @@ import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from 'primevue/api';
-import "vue-easytable/libs/theme-default/index.css"; // import style
 import VueCreditCardValidation from 'vue-credit-card-validation';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+import 'primeflex/primeflex.min.css';
+import 'primeicons/primeicons.css';
+import 'primevue/resources/primevue.min.css';
+import 'primevue/resources/themes/saga-blue/theme.css';
+import 'primevue/resources/themes/fluent-light/theme.css';
 
 loadFonts()
 
@@ -59,7 +64,7 @@ createApp(App)
   .use(vuetify)
   .use(store)
   .use(FilterMatchMode)
-  .use(PrimeVue)
+  .use(PrimeVue, { ripple: true })
   .use(VueCreditCardValidation)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
