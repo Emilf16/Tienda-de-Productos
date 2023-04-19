@@ -282,13 +282,6 @@
                     <v-card-actions>
                         <v-btn @click="closeDireccionDialog()" variant="plain">Cancelar</v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn color="error" text @click="deleteDireccion" v-if="!isAddDireccionDialog" variant="outlined" prepend-icon="mdi-delete-outline">
-                            <template v-slot:prepend>
-                                <v-icon></v-icon>
-                            </template>
-
-                            Eliminar
-                        </v-btn>
                         <v-btn prepend-icon="mdi-content-save-outline" color="warning" @click="saveDireccion()" variant="flat" :loading="loading">
                             <template v-slot:prepend>
                                 <v-icon></v-icon>
@@ -378,13 +371,6 @@
                             <v-row>
                                 <v-btn @click="closeMetodoDialog()" variant="plain">Cancelar</v-btn>
                                 <v-spacer></v-spacer>
-                                <v-btn color="error" text @click="deleteMetodo" v-if="!isAddMetodoDialog" variant="outlined" prepend-icon="mdi-delete-outline">
-                                    <template v-slot:prepend>
-                                        <v-icon></v-icon>
-                                    </template>
-
-                                    Eliminar
-                                </v-btn>
                                 <v-btn prepend-icon="mdi-content-save-outline" color="warning" @click="saveMetodo()" variant="flat" :loading="loading">
                                     <template v-slot:prepend>
                                         <v-icon></v-icon>
@@ -599,6 +585,13 @@ export default {
             return `Fecha de Exp.: ${month.toString().padStart(2, '0')}/${year}`;
         },
 
+        formattedExpirationDateMetodo(dateString) {
+            const date = new Date(dateString);
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear().toString();
+            return `${month.toString().padStart(2, '0')} / ${year}`;
+        },
+
         uploadImage() {
             this.$refs.fileInput.click(); // abrir el input file al hacer clic en el avatar
         },
@@ -706,17 +699,14 @@ export default {
             this.newDireccion.EsPrincipal = false;
         },
         resetMetodoForm() {
-            this.direccionDialogTitle = "Agregar dirección";
-            this.isAddDireccionDialog = true;
-            this.newDireccion.idDireccion = 0;
-            this.newDireccion.Direccion = "";
-            this.newDireccion.Ciudad = "";
-            this.newDireccion.CodigoPostal = "";
-            this.newDireccion.Pais = "República Dominicana";
-            this.newDireccion.EsPrincipal = false;
-        },
-        eliminarDireccion(){
-            
+            this.metodoDialogTitle = "Agregar método de pado";
+            this.isAddMetodoDialog = true;
+            this.newMetodo.idMetodo = 0;
+            this.newMetodo.Tipo = "";
+            this.newMetodo.Numero = "";
+            this.newMetodo.FechaExpiracion = "";
+            this.newMetodo.CVV = "";
+            this.newMetodo.EsPrincipal = false;
         },
         async saveDireccion(){
             const url = 'https://tiendabackend.azurewebsites.net/api/Direcciones';
@@ -775,7 +765,7 @@ export default {
             }                
         },
         editDireccion(index) {
-            this.resetForm();
+            this.resetDireccionForm();
             this.isAddDireccionDialog = false;
             this.newDireccion.idDireccion = this.direcciones[index].idDireccion;
             this.newDireccion.Direccion = this.direcciones[index].Direccion;
@@ -786,15 +776,17 @@ export default {
             this.direccionDialogTitle = "Editar dirección";
             this.showDireccionDialog = true;
         },
-        deleteDireccion() {
-
-        },
         async saveMetodo(){
             const url = 'https://tiendabackend.azurewebsites.net/api/MetodosPagos';
             this.newMetodo.idUsuario = this.user.idUsuario;
-            this.newMetodo.Tipo = this.cardBrand.charAt(0).toUpperCase() + this.cardBrand.slice(1);
+            if (this.cardBrand != null) {
+                this.newMetodo.Tipo = this.cardBrand.charAt(0).toUpperCase() + this.cardBrand.slice(1);    
+            } else {
+                this.newMetodo.Tipo = "Tarjeta de débito";    
+            }
 
             const model = Object.assign({}, this.newMetodo);
+            console.log(model);
 
             try {
                 if (this.newMetodo.idMetodo == 0){
@@ -837,6 +829,7 @@ export default {
                     }
                     else {
                         this.loading = false;
+                        console.log(response.data);
                         this.toast.warning(response.data.Message, this.$store.state.defaultToastOptions);
                     }
                 }
@@ -845,6 +838,20 @@ export default {
                 this.loading = false;
                 this.toast.error("Error 500. Error al realizar la operación.", this.$store.state.defaultToastOptions);
             }                
+        },
+        editMetodo(index) {
+            this.resetMetodoForm();
+            this.isAddMetodoDialog = false;
+            
+            this.newMetodo.idMetodo = this.metodosDePago[index].idMetodo;
+            this.newMetodo.Tipo = this.metodosDePago[index].Tipo;
+            this.newMetodo.Numero = this.metodosDePago[index].Numero;
+            this.newMetodo.FechaExpiracion = this.formattedExpirationDateMetodo(this.metodosDePago[index].FechaExpiracion);
+            this.newMetodo.CVV = "";
+            this.newMetodo.EsPrincipal = this.metodosDePago[index].EsPrincipal;
+
+            this.metodoDialogTitle = "Editar método de pago";
+            this.showMetodoDialog = true;
         },
     },
 }
