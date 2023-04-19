@@ -46,7 +46,13 @@
   <v-container fluid>
     <v-row class="mx-4 my-4">
       <v-col cols="12" class="py-2">
-        <v-card-title>Categorias</v-card-title>
+        <v-card-title
+          style="
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: bold;
+          "
+          >Categorias</v-card-title
+        >
 
         <v-btn-toggle
           v-model="text"
@@ -55,12 +61,16 @@
           group
         >
           <v-btn
+            style="
+              font-family: 'Poppins', sans-serif !important;
+              font-weight: bold;
+            "
             v-for="categoria in listaCategorias"
             v-bind:key="categoria.idCategoria"
             v-bind:categoria="categoria"
             v-model="categoria.idCategoria"
             rounded="0"
-            color="yellow-accent-4"
+            color="warning"
             group
             @click="filtrarProductos(categoria.idCategoria)"
             >{{ categoria.Nombre }}
@@ -80,41 +90,90 @@
       >
         <v-card class="mx-auto my-2" max-width="auto" elevation="6">
           <v-img
+            v-if="producto.Imagen != null"
             :src="producto.Imagen"
             :alt="producto.Nombre"
             height="200px"
             contain
           ></v-img>
-          <v-card-title>{{ producto.Nombre }}</v-card-title>
-          <v-card-subtitle>
-            <span class="me-1">{{ producto.Precio }}</span>
-            <v-icon color="error" icon="mdi-fire-circle" size="small"></v-icon>
-          </v-card-subtitle>
+          <v-img
+            v-else
+            src="https://ecomworld.shop/uploads/default-product.png"
+            :alt="producto.Nombre"
+            height="300px"
+            contain
+          ></v-img>
+          <v-card-title
+            style="
+              font-family: 'Poppins', sans-serif !important;
+              font-weight: bold;
+            "
+            >{{ producto.Nombre }}</v-card-title
+          >
+          <v-card-title
+            style="
+              font-family: 'Poppins', sans-serif !important;
+              font-weight: bold;
+            "
+            >RD$ {{ producto.Precio }}</v-card-title
+          >
           <v-card-text>
             <v-row align="center" class="mx-0">
               <v-rating
                 :model-value="producto.Valoracion"
-                color="amber"
+                color="warning"
                 density="compact"
                 half-increments
                 readonly
                 size="small"
               ></v-rating>
-              <div class="text-grey ms-4">{{ producto.Valoracion }}</div>
+              <div
+                class="text-grey ms-4"
+                style="
+                  font-family: 'Poppins', sans-serif !important;
+                  font-weight: bold;
+                "
+              >
+                {{ producto.Valoracion }}/5
+              </div>
             </v-row>
           </v-card-text>
           <v-textarea
-            style="background-color: white"
+            style="
+              font-family: 'Poppins', sans-serif !important;
+              font-weight: light;
+            "
             v-model="producto.Descripcion"
             variant="filled"
             auto-grow
             label="Descripción"
-            rows="5"
+            rows="6"
             row-height="30"
             shaped
           ></v-textarea>
-          <v-divider class="mx-4 mb-1"></v-divider>
-          <v-card-title>En Stock</v-card-title>
+          <v-card-text
+            style="
+              font-family: 'Poppins', sans-serif !important;
+              font-weight: bold;
+            "
+            v-if="producto.CantidadStock < 21"
+            class="text-red-accent-4 text-h6"
+          >
+            Solo queda(n) {{ producto.CantidadStock }} en Stock
+          </v-card-text>
+
+          <v-card-text
+            v-else
+            class="text-h6"
+            style="
+              font-family: 'Poppins', sans-serif !important;
+              font-weight: bold;
+            "
+          >
+            En Stock
+          </v-card-text>
+          <!-- HACER QUE SI QUEDAN MENOS DE 5 PRODUCTOS SALGA MENSAJE ROJO AVISANDO -->
+
           <v-card-actions class="d-flex" style="justify-content: space-between">
             <v-btn color="#090C29" variant="flat" text class="flex-grow-1 ml-2">
               <span style="color: white; font-weight: bold">Ver</span>
@@ -256,47 +315,19 @@ export default {
     },
 
     async agregarAlCarrito(produto) {
-      const token = localStorage.getItem("token");
-
-      const url = `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${
-        produto.idProducto
-      }&cantidad=${1}&precioPorProducto=${0}`;
-
       try {
-        const response = await api.post(url);
+        const response = await api.post(
+          `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${produto.idProducto}&cantidad=1&precioPorProducto=0`
+        );
 
-        // Obtener el token de la respuesta y guardarlo en el almacenamiento local
-        if (response.data.Success) {
-          this.toast.success(response.data.Message, {
-            timeout: 3000,
-            closeOnClick: true,
-            pauseOnFocusLoss: false,
-            pauseOnHover: false,
-            draggable: true,
-            draggablePercent: 0.6,
-            showCloseButtonOnHover: true,
-            hideProgressBar: true,
-            closeButton: "button",
-            icon: true,
-            rtl: false,
-          });
-        } else {
-          this.toast.warning(response.data.Message, {
-            timeout: 3000,
-            closeOnClick: true,
-            pauseOnFocusLoss: false,
-            pauseOnHover: false,
-            draggable: true,
-            draggablePercent: 0.6,
-            showCloseButtonOnHover: true,
-            hideProgressBar: true,
-            closeButton: "button",
-            icon: true,
-            rtl: false,
-          });
-        }
+        console.log(response);
+
+        // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
       }
     },
 
