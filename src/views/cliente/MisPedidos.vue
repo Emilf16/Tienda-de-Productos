@@ -100,7 +100,7 @@
                                                         {{formatCurrency(data.Precio)}}
                                                     </template>
                                                 </Column>
-                                                <Column header="Valoración" sortable>
+                                                <Column field="Valoracion" header="Valoración" sortable>
                                                     <template #body="slotProps" >
                                                         <Rating :modelValue="slotProps.data.Valoracion" readonly :cancel="false" />
                                                     </template>
@@ -154,7 +154,6 @@
 
         data() {
             return {
-                customers: null,
                 filters: {
                     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                     status: { value: null, matchMode: FilterMatchMode.EQUALS },
