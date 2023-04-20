@@ -57,7 +57,7 @@
                                     </div>
                                 </template>
                                 <Column field="idPedido" header="# de Pedido" sortable ></Column>
-                                <Column field="idUsuario" header="idUsuario" sortable ></Column>
+                                <Column field="NombreUsuario" header="Usuario" sortable ></Column>
                                 <Column field="Estado" header="Estado" sortable style="width: 10%">
                                     <template #editor>
                                         <Dropdown v-model="selectedEstatus" :options="statuses" optionLabel="idEstado" class="w-full">
