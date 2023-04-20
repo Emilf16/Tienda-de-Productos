@@ -148,7 +148,7 @@
             variant="filled"
             auto-grow
             label="Descripción"
-            rows="6"
+            rows="4"
             row-height="30"
             shaped
           ></v-textarea>

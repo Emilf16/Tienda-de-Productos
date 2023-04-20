@@ -197,7 +197,7 @@
       <v-col cols="12" lg="4" md="6">
         <v-btn
           color="#F7BB44"
-          @click="clearCart"
+          @click="limpiarCarrito"
           style="margin-top: 10%; margin-left: 61%; margin-bottom: 9%"
         >
           <span style="font-weight: bold; color: white">Limpiar Carrito</span>
@@ -245,7 +245,7 @@
           <v-card-text> </v-card-text>
           <v-btn
             color="primary"
-            @click="showPaymentModal()"
+            @click="mostrarPagoDialog()"
             class="ml-4 d-flex justify-center"
             >Pagar</v-btn
           >
@@ -254,99 +254,150 @@
     </v-row>
 
     <!-- pagar productos /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
-    <v-dialog v-model="checkoutModal" max-width="550">
-      <v-card color="#ffffff" theme="light" elevation="0">
+    <Dialog
+      v-model:visible="pagoDialog"
+      modal
+      header="Pagar Carrito"
+      :style="{ width: 'auto' }"
+    >
+      <v-col>
+        <v-col>
+          <label for="tarjeta">Tarjeta</label>
+        </v-col>
+        <v-col>
+          <Dropdown
+            v-model="tarjetaSeleccionada"
+            :options="metodosDePago"
+            optionLabel="Tipo"
+            placeholder="Tarjeta"
+            class="w-full md:w-20rem"
+          />
+        </v-col>
+        <v-col>
+          <label for="direccion">Dirección</label>
+        </v-col>
+        <v-col>
+          <Dropdown
+            v-model="direccionSeleccionada"
+            :options="direcciones"
+            optionLabel="Direccion"
+            placeholder="Dirección"
+            class="w-full md:w-20rem"
+          />
+        </v-col>
+      </v-col>
+
+      <template #footer>
+        <Button
+          label="Cancelar"
+          icon="pi pi-times"
+          @click="cerrarPagoDialog()"
+          text
+          style="color: white; background-color: red"
+        />
+        <Button
+          label="Confirmar"
+          icon="pi pi-check"
+          style="color: white; background-color: green"
+          @click="pagarProductosCarrito()"
+          autofocus
+        />
+      </template>
+    </Dialog>
+    <!-- agregar tarjeta productos /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+
+    <v-dialog v-model="showMetodoDialog" max-width="700">
+      <v-card>
+        <v-toolbar dense color="rgb(9, 12, 41)">
+          <v-toolbar-title class="text-white">{{
+            metodoDialogTitle
+          }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeMetodoDialog">
+            <v-icon class="text-white">mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text>
-          <div class="container d-flex flex-column align-center justify-center">
-            <div
-              class="card"
-              style="
-                font-family: 'Poppins', sans-serif;
-                height: 260px;
-                width: 350px;
-              "
-            >
-              <div class="top">
-                <h3 class="mb-7 mt-5" style="margin-left: 100px">
-                  Agregar Tarjeta
-                </h3>
-                <hr />
-              </div>
-              <div class="card-details mt-6">
-                <span style="margin-right: 17%">Número</span>
-                <input
-                  type="text"
-                  placeholder="0000 0000 0000 0000"
-                  data-slots="0"
-                  data-accept="\d"
-                  size="19"
-                  style="padding-left: 5px; margin-left: 3%"
-                  maxlength="16"
-                />
-                <i class="fa fa-credit-card"></i>
-              </div>
-
-              <div class="exp-cvv">
-                <div class="card-details mt-4">
-                  <span style="margin-right: 17%">Fecha</span>
-                  <input
-                    type="text"
-                    placeholder="MM/YYYY"
-                    data-slots="my"
-                    size="5"
-                    maxlength="3"
-                    style="padding-left: 5px; margin-left: 8%"
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    label="Número de tarjeta"
+                    v-model="newMetodo.Numero"
+                    :rules="[rules.required, rules.cardNumber]"
+                    variant="outlined"
+                    v-cardformat:formatCardNumber
+                  >
+                    <template v-slot:prepend>
+                      <v-icon>mdi-credit-card-outline</v-icon>
+                    </template>
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    label="Nombre en la tarjeta"
+                    v-model="cardholderName"
+                    :rules="[rules.required, rules.name]"
+                    variant="outlined"
                   />
-
-                  <i class="fa fa-calendar"></i>
-                </div>
-                <div class="card-details mt-4">
-                  <span style="margin-right: 17%">CVV</span>
-                  <input
-                    type="text"
-                    placeholder="000"
-                    data-slots="my"
-                    data-accept="\d"
-                    size="7"
-                    style="padding-left: 5px; margin-left: 13%"
-                    maxlength="3"
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-menu
+                    ref="expDateMenu"
+                    v-model="expDateMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    lazy
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="newMetodo.FechaExpiracion"
+                        label="Fecha de vencimiento"
+                        prepend-icon="mdi-calendar"
+                        :rules="[rules.required, rules.expDate]"
+                        v-bind="attrs"
+                        v-on="on"
+                        variant="outlined"
+                        v-cardformat:formatCardExpiry
+                      />
+                    </template>
+                  </v-menu>
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    label="Código de seguridad (CVV)"
+                    v-model="newMetodo.CVV"
+                    :rules="[rules.required, rules.CVV]"
+                    variant="outlined"
+                    v-cardformat:formatCardCVC
                   />
-                  <i class="fa fa-info-circle"></i>
-                </div>
-              </div>
-              <div class="card-details mt-4 mb-5">
-                <span style="margin-right: 17%; margin-top: 10px">Nombre</span>
-                <input
-                  type="text"
-                  placeholder="Nombre en tarjeta"
-                  style="padding-left: 5px; margin-left: 4%"
-                />
-              </div>
-            </div>
-          </div>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-btn @click="closeMetodoDialog()" variant="plain"
+                  >Cancelar</v-btn
+                >
+                <v-spacer></v-spacer>
+                <v-btn
+                  prepend-icon="mdi-content-save-outline"
+                  color="warning"
+                  @click="saveMetodo()"
+                  variant="flat"
+                  :loading="loading"
+                >
+                  <template v-slot:prepend>
+                    <v-icon></v-icon>
+                  </template>
+
+                  Guardar
+                </v-btn>
+              </v-row>
+            </v-container>
+          </v-form>
         </v-card-text>
-        <v-card-actions style="margin-top: -10px">
-          <v-spacer></v-spacer>
-          <v-btn
-            class="mb-5"
-            color="#BE1D1D"
-            variant="flat"
-            style="margin-left: 20px"
-            @click="closeCheckout"
-          >
-            <span style="color: white; font-weight: bold"> Cancelar </span>
-          </v-btn>
-          <v-btn
-            class="mb-5"
-            color="#008F39"
-            variant="flat"
-            style="margin-left: 160px"
-            @click="checkout"
-          >
-            <span style="color: white; font-weight: bold"> Confirmar </span>
-          </v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-container>
@@ -354,14 +405,30 @@
 
 <script>
 import api from "../../utilities/api";
-// import VueCreditCardValidation from 'vue-credit-card-validation';
+import Button from "primevue/button";
+import Dialog from "primevue/dialog";
+import Dropdown from "primevue/dropdown";
+import axios from "axios";
 export default {
   // props: ['productosCarrito'],
-
+  components: {
+    Button,
+    Dialog,
+    Image,
+    Dropdown,
+  },
   data() {
     return {
-      verProducto: false,
+      tarjetaSeleccionada: {},
+      direccionSeleccionada: {},
+      token: localStorage.getItem("token"),
+      user: {},
+      userVerification: {},
       listaProductosCarrito: [],
+      pagoDialog: false,
+      showMetodoDialog: false,
+      metodosDePago: [],
+      direcciones: [],
       cardHolderName: "",
       cardNumber: "",
       expirationDate: "",
@@ -392,71 +459,79 @@ export default {
         (v) => !!v || "El CVV es requerido",
         (v) => /^\d{3}$/.test(v) || "El CVV debe ser de 3 dígitos",
       ],
-      checkoutModal: false,
-
-      incrementCount(index) {
-        this.listaProductosCarrito[index].count++;
-      },
-      margins: {
-        top: 80,
-        bottom: 60,
-        left: 40,
-        width: 522,
-      },
-      state() {
-        return {
-          productosCarrito: [],
-        };
-      },
     };
   },
   methods: {
-    agregarNuevoProducto(producto) {
-      this.incrementCount(producto.index);
-      this.listaProductosCarrito.push(producto);
+    limpiarCarrito() {
+      this.listaProductosCarrito = [];
     },
 
-    cerrarProductoModal() {
-      this.verProducto = false;
+    mostrarPagoDialog() {
+      this.pagoDialog = true;
+    },
+    cerrarPagoDialog() {
+      this.pagoDialog = false;
     },
 
-    verProductoModal() {
-      this.verProducto = true;
+    /////TARJETA METODO PAGO/////////////////////////////////////////////////////////////////////////////////////////
+    closeMetodoDialog() {
+      this.showMetodoDialog = false;
     },
-    calcularCantidad(producto) {
-      this.verProductoModal();
-      console.log(producto);
-    },
-    removeItem(index) {
-      this.listaProductosCarrito.splice(index, 1);
-    },
-    clearCart() {
-      this.selectedItems = [];
-      this.productosCarrito = [];
-    },
-
-    processPayment() {
-      // Lógica para procesar el pago
-    },
-    showPaymentModal() {
-      this.checkoutModal = true;
-    },
-    closeCheckout() {
-      this.checkoutModal = false;
-    },
-    checkout() {
-      this.$refs.form.validate().then((valid) => {
-        if (valid) {
-          // Procesar el pago...
-          this.$refs.form.resetValidation();
-          this.closeCheckout();
-          this.productosCarrito = [];
-          alert("Pago procesado correctamente");
-        }
-      });
+    openMetodoDialog() {
+      this.resetMetodoForm();
+      this.showMetodoDialog = true;
     },
 
     ///API METHODS///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    async pagarProductosCarrito() {
+      try {
+        const response = await api.post(
+          `https://tiendabackend.azurewebsites.net/api/Pedidos/Pagar?idUsuario=${this.listaProductosCarrito.idUsuario}&idMetodoPago=${this.tarjetaSeleccionada.idMetodo}&idDireccion=${this.direccionSeleccionada.idDireccion}`
+        );
+
+        this.direcciones = response.data;
+        console.log(response.data);
+        // this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+      console.log(this.tarjetaSeleccionada.idMetodo);
+      console.log(this.direccionSeleccionada);
+      this.cargarCarrito();
+      this.pagoDialog = false;
+    },
+
+    async cargarDirecciones() {
+      try {
+        const response = await api.get(
+          `https://tiendabackend.azurewebsites.net/api/Direcciones/GetDireccionesUsuario?idUsuario=" +
+          ${this.listaProductosCarrito.idUsuario}`
+        );
+
+        this.direcciones = response.data;
+        console.log(response.data);
+        // this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+
+    async cargarTarjetas() {
+      try {
+        const response = await api.get(
+          `https://tiendabackend.azurewebsites.net/api/MetodosPagos/GetMetodosUsuario?idUsuario=" +
+            ${this.listaProductosCarrito.idUsuario}`
+        );
+
+        console.log(response.data);
+        this.metodosDePago = response.data;
+
+        // this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+
     async cargarCarrito() {
       try {
         const response = await api.get(
@@ -468,10 +543,7 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        this.toast.error(
-          "Error 500. Error al agregar al carrito." + error,
-          this.toastProperties
-        );
+        console.error("Error:", error);
       }
     },
     async agregarOtroProductoCarrito(producto) {
@@ -485,10 +557,7 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        this.toast.error(
-          "Error 500. Error al agregar al carrito." + error,
-          this.toastProperties
-        );
+        console.error("Error:", error);
       }
     },
     async borrarProductoCarrito(producto) {
@@ -502,15 +571,14 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        this.toast.error(
-          "Error 500. Error al agregar al carrito." + error,
-          this.toastProperties
-        );
+        console.error("Error:", error);
       }
     },
   },
   mounted() {
     this.cargarCarrito();
+    this.cargarDirecciones();
+    this.cargarTarjetas();
   },
 };
 </script>
