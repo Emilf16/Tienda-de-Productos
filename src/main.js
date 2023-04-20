@@ -11,6 +11,9 @@ import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from "primevue/api";
 import VueCreditCardValidation from "vue-credit-card-validation";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ConfirmationService from 'primevue/confirmationservice';
+import DialogService from 'primevue/dialogservice'
+
 // import InputNumber from 'primevue/inputnumber';
 
 import "primeflex/primeflex.min.css";
@@ -59,6 +62,8 @@ createApp(App)
   .use(store)
   .use(FilterMatchMode)
   .use(PrimeVue, { ripple: true })
+  .use(ConfirmationService)
+  .use(DialogService)
   .use(VueCreditCardValidation)
   .use(Toast, {
     transition: "Vue-Toastification__fade",

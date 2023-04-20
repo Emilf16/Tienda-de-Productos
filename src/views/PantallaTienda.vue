@@ -104,7 +104,7 @@
           style="text-decoration: none; color: inherit"
           ><v-list-item
             prepend-icon="mdi-cart-arrow-down"
-            title="Gestionar Stock"
+            title="Inventario"
             value="stock"
           ></v-list-item
         ></router-link>
@@ -125,7 +125,7 @@
           style="text-decoration: none; color: inherit"
           ><v-list-item
             prepend-icon="mdi-account-key"
-            title="Gestionar Roles"
+            title="Perfiles y Roles"
             value="roles"
           ></v-list-item
         ></router-link>
@@ -135,8 +135,18 @@
           style="text-decoration: none; color: inherit"
           ><v-list-item
             prepend-icon="mdi-store"
-            title="Gestionar Categorias"
+            title="Categorías"
             value="categoria"
+          ></v-list-item
+        ></router-link>
+        <!-- gestionar Pedidos -->
+        <router-link
+          to="/gestionarPedidos"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+            prepend-icon="mdi-package-variant"
+            title="Pedidos"
+            value="gestionPedidos"
           ></v-list-item
         ></router-link>
       </v-list>

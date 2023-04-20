@@ -25,7 +25,19 @@
         margin: 10px 5px 15px 5px;
     }
 
-    .pi { font-family: PrimeIcons !important;  }
+    .pi { 
+        font-family: PrimeIcons !important;  
+    }
+
+    .picklistName {
+        font-size: 14px;
+    }
+
+    .picklistURL {
+        color: #a7a7a7;
+        font-size: small;
+    }
+
 </style>
 
 <template>
@@ -41,19 +53,30 @@
                 <div class="containerCols">
                     <div class="content">
                         <h1 class="pageTitle">Perfiles y Roles</h1>
+                        <InlineMessage v-if="sinGuardar" severity="warn">Hay elementos sin guardar.</InlineMessage>
                         <div>
                             <DataTable ref="dt"  v-model:filters="filters" :value="perfiles" resizableColumns columnResizeMode="fit" removableSort tableStyle="min-width: 50rem" paginator :rows="10" dataKey="id" :loading="loading">
                                 <template #empty> No se han encontrado perfiles. </template>
                                 <template #header>
                                     <div class="flex justify-content-between">
-                                        <Button icon="pi pi-external-link" label="Exportar" severity="warning" @click="exportCSV($event)" >
-                                            <span class="pi pi-external-link p-button-icon p-button-icon-left"></span>
-                                            <span class="p-button-label">Exportar</span>
-                                            <v-tooltip
-                                                activator="parent"
-                                                location="top"
-                                                >Exportar en Excel</v-tooltip>
-                                        </Button>
+                                        <div>
+                                            <Button icon="pi pi-external-link" style="margin: 0px 5px" label="Exportar" severity="warning" @click="exportCSV($event)" >
+                                                <span class="pi pi-external-link p-button-icon p-button-icon-left"></span>
+                                                <span class="p-button-label">Exportar</span>
+                                                <v-tooltip
+                                                    activator="parent"
+                                                    location="top"
+                                                    >Exportar en Excel</v-tooltip>
+                                            </Button>
+                                            <Button icon="pi pi-external-link" style="margin: 0px 5px" label="Exportar" severity="primary" @click="newProfile()" >
+                                                <span class="pi pi-plus p-button-icon"></span>
+                                                <span class="p-button-label">&nbsp;</span>
+                                                <v-tooltip
+                                                    activator="parent"
+                                                    location="top"
+                                                    >Nuevo perfil</v-tooltip>
+                                            </Button>
+                                        </div>
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
                                             <InputText v-model="filters['global'].value" placeholder="Buscar..." />
@@ -88,77 +111,91 @@
                                 <Dialog v-model:visible="perfilDetailsVisible" header="Editar perfil" :style="{ width: '60vw' }" maximizable modal>
                                     <div class="dialogContent">
                                         <v-form ref="form">
-                                            <div class="flex flex-column gap-2 p-2">
-                                                <label for="nombre">Nombre del perfil:</label>
-                                                <InputText id="nombre" v-model="actualDetails.Nombre" aria-describedby="username-help" />
-                                            </div>
-                                            <div class="flex flex-column gap-2 p-2">
-                                                <label for="descripcion">Descripción del perfil:</label>
-                                                <Textarea id="nombre" v-model="actualDetails.Descripcion" autoResize rows="5" />
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <div class="d-flex flex-column gap-2 p-2">
-                                                    <label for="PorDefecto">Perfil por defecto:</label>
-                                                    <InputSwitch id="PorDefecto" v-model="actualDetails.PorDefecto" />
+                                            <div class="d-flex justify-content-between" style="margin: 0px 10px;">
+                                                <div class="flex flex-column gap-2 p-2" style="width: 70%">
+                                                    <label class="font-bold" for="nombre">Nombre del perfil:</label>
+                                                    <InputText id="nombre" v-model="actualDetails.Nombre" aria-describedby="username-help" />
                                                 </div>
-                                                <div class="flex flex-column gap-2 p-2">
-                                                    <label for="EstaActivo">Activo:</label>
-                                                    <InputSwitch id="EstaActivo" v-model="actualDetails.EstaActivo" />
+                                                <div class="d-flex flex-column gap-2 p-2">
+                                                    <label class="font-bold" for="PorDefecto">Por defecto:</label>
+                                                    <InputSwitch id="PorDefecto" v-model="actualDetails.PorDefecto" />
                                                 </div>
                                             </div>
                                             
+                                            <div class="flex flex-column gap-2 p-2" style="margin: 0px 10px;">
+                                                <label class="font-bold" for="descripcion">Descripción del perfil:</label>
+                                                <Textarea id="nombre" v-model="actualDetails.Descripcion" autoResize rows="5" />
+                                            </div>
+                                            
+                                            <div class="flex flex-column gap-2 p-2" style="margin: 0px 10px;">
+                                                <label class="font-bold" for="Permisos">Permisos:</label>
+
+                                                <PickList id ="Permisos" v-model="vistasDisponibles" dataKey="idVista">
+                                                    <template #sourceheader> Disponibles </template>
+                                                    <template #targetheader> Seleccionados </template>
+                                                    <template #item="slotProps">
+                                                        <div class="flex flex-wrap align-items-center">
+                                                            <div class="flex-1 flex flex-column">
+                                                                <span class="picklistName">{{ slotProps.item.Vista }}</span>
+                                                                <div class="flex align-items-center">
+                                                                    <span class="picklistURL">{{ slotProps.item.URL }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </PickList>
+                                            </div>
                                         </v-form>
-                                        <PickList v-model="products" listStyle="height:342px" dataKey="id">
-                                            <template #sourceheader> Available </template>
-                                            <template #targetheader> Selected </template>
-                                            <template #item="slotProps">
-                                                <div class="flex flex-wrap p-2 align-items-center gap-3">
-                                                    <img class="w-4rem shadow-2 flex-shrink-0 border-round" :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.item.image" :alt="slotProps.item.name" />
-                                                    <div class="flex-1 flex flex-column gap-2">
-                                                        <span class="font-bold">{{ slotProps.item.name }}</span>
-                                                        <div class="flex align-items-center gap-2">
-                                                            <i class="pi pi-tag text-sm"></i>
-                                                            <span>{{ slotProps.item.category }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <span class="font-bold text-900">$ {{ slotProps.item.price }}</span>
-                                                </div>
-                                            </template>
-                                        </PickList>
-                                        <PickList   
-                                            :source="vistasDisponibles"
-                                            :target="vistasAsignadas"
-                                            :show-source-filter="true"
-                                            :show-target-filter="true"
-                                            :source-filter-placeholder="'Filtrar disponibles'"
-                                            :target-filter-placeholder="'Filtrar asignados'"
-                                            :source-header="'Disponibles'"
-                                            :target-header="'Asignados'"
-                                            :item-value="'idVista'"
-                                            :item-label="'Nombre'"
-                                            @target-select="eliminarDisponiblesSeleccionados"
-                                            @source-select="eliminarAsignadosSeleccionados"
-                                            listStyle="height:342px">
-                                            <template #sourceheader> Disponibles </template>
-                                            <template #targetheader> Asignados </template>
-                                            <!-- <template #item="slotProps">
-                                                <div class="flex flex-wrap p-2 align-items-center gap-3">
-                                                    <div class="flex-1 flex flex-column gap-2">
-                                                        <span class="font-bold">{{ slotProps }}</span>
-                                                        <div class="flex align-items-center gap-2">
-                                                            <i class="pi pi-tag text-sm"></i>
-                                                            <span>{{ slotProps }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <span class="font-bold text-900">$ {{ slotProps.item.price }}</span>
-                                                </div>
-                                            </template> -->
-                                        </PickList>
                                     </div>
                                     
                                     
                                     <template #footer>
-                                        <Button label="Guardar" icon="pi pi-save" @click="detailsVisible = false" />
+                                        <Button label="Guardar" icon="pi pi-save" @click="saveEditingProfile(actualDetails, vistasDisponibles[1])" />
+                                    </template>
+                                </Dialog>
+
+                                <Dialog v-model:visible="perfilNewVisible" header="Nuevo perfil" :style="{ width: '60vw' }" maximizable modal>
+                                    <div class="dialogContent">
+                                        <v-form ref="form">
+                                            <div class="d-flex justify-content-between" style="margin: 0px 10px;">
+                                                <div class="flex flex-column gap-2 p-2" style="width: 70%">
+                                                    <label class="font-bold" for="nombre">Nombre del perfil:</label>
+                                                    <InputText id="nombre" v-model="actualNew.Nombre" aria-describedby="username-help" />
+                                                </div>
+                                                <div class="d-flex flex-column gap-2 p-2">
+                                                    <label class="font-bold" for="PorDefecto">Por defecto:</label>
+                                                    <InputSwitch id="PorDefecto" v-model="actualNew.PorDefecto" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex flex-column gap-2 p-2" style="margin: 0px 10px;">
+                                                <label class="font-bold" for="descripcion">Descripción del perfil:</label>
+                                                <Textarea id="nombre" v-model="actualNew.Descripcion" autoResize rows="5" />
+                                            </div>
+                                            
+                                            <div class="flex flex-column gap-2 p-2" style="margin: 0px 10px;">
+                                                <label class="font-bold" for="Permisos">Permisos:</label>
+
+                                                <PickList id ="Permisos" v-model="vistasDisponibles" dataKey="idVista">
+                                                    <template #sourceheader> Disponibles </template>
+                                                    <template #targetheader> Seleccionados </template>
+                                                    <template #item="slotProps">
+                                                        <div class="flex flex-wrap align-items-center">
+                                                            <div class="flex-1 flex flex-column">
+                                                                <span class="picklistName">{{ slotProps.item.Vista }}</span>
+                                                                <div class="flex align-items-center">
+                                                                    <span class="picklistURL">{{ slotProps.item.URL }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </PickList>
+                                            </div>
+                                        </v-form>
+                                    </div>
+                                    
+                                    <template #footer>
+                                        <Button label="Guardar" icon="pi pi-save" @click="saveNewProfile(actualNew, vistasDisponibles[1])" />
                                     </template>
                                 </Dialog>
                             </DataTable>
@@ -184,6 +221,7 @@
     import PickList from 'primevue/picklist'
     import InputSwitch from 'primevue/inputswitch'
     import Textarea from 'primevue/textarea'
+    import InlineMessage from 'primevue/inlinemessage'
     import 'primeicons/primeicons.css';
 
     export default {
@@ -202,7 +240,8 @@
             Dialog,
             PickList,
             InputSwitch,
-            Textarea
+            Textarea,
+            InlineMessage
         },
 
         data() {
@@ -233,88 +272,43 @@
                 ],
                 pageLoaded: false,
                 token: localStorage.getItem('token'),
-                actualDetails: {},
                 perfilDetailsVisible: false,
+                perfilNewVisible: false,
+                vistasDisponibles: [],
                 vistas: [],
                 perfiles: [],
-                vistasDisponibles: [],
+                actualDetails: {},
+                actualNew: {},
                 vistasAsignadas: [],
-                vistasSeleccionadas: [],
-                sourceCars: ['Audi', 'BMW', 'Fiat', 'Ford', 'Honda', 'Jaguar', 'Mercedes', 'Renault', 'VW'],
-                targetCars: [],
-                productos: [
-                {
-                    id: '1000',
-                    code: 'f230fh0g3',
-                    name: 'Bamboo Watch',
-                    description: 'Product Description',
-                    image: 'bamboo-watch.jpg',
-                    price: 65,
-                    category: 'Accessories',
-                    quantity: 24,
-                    inventoryStatus: 'INSTOCK',
-                    rating: 5
+                vistasSeleccionadas: [],    
+                sinGuardar: false,
+            }
+        },
+        watch: {
+            actualDetails: {
+                handler(newVal) {
+                    // Comprueba si los objetos dentro del array perfiles son diferentes a los objetos dentro de actualDetails
+                    const perfilesDiferentes = this.perfiles.filter(perfil => {
+                    for (let key in newVal) {
+                        if (Object.prototype.hasOwnProperty.call(newVal, key)) {
+                        for (let subKey in newVal[key]) {
+                            if (Object.prototype.hasOwnProperty.call(newVal[key], subKey)) {
+                            if (JSON.stringify(perfil) === JSON.stringify(newVal[key][subKey])) {
+                                return false;
+                            }
+                            }
+                        }
+                        }
+                    }
+                    return true;
+                    });
+                    if (perfilesDiferentes.length === this.perfiles.length) {
+                    this.sinGuardar = true;
+                    } else {
+                    this.sinGuardar = false;
+                    }
                 },
-                {
-                    id: '1001',
-                    code: 'nvklal433',
-                    name: 'Black Watch',
-                    description: 'Product Description',
-                    image: 'black-watch.jpg',
-                    price: 72,
-                    category: 'Accessories',
-                    quantity: 61,
-                    inventoryStatus: 'INSTOCK',
-                    rating: 4
-                },
-                {
-                    id: '1002',
-                    code: 'zz21cz3c1',
-                    name: 'Blue Band',
-                    description: 'Product Description',
-                    image: 'blue-band.jpg',
-                    price: 79,
-                    category: 'Fitness',
-                    quantity: 2,
-                    inventoryStatus: 'LOWSTOCK',
-                    rating: 3
-                },
-                {
-                    id: '1003',
-                    code: '244wgerg2',
-                    name: 'Blue T-Shirt',
-                    description: 'Product Description',
-                    image: 'blue-t-shirt.jpg',
-                    price: 29,
-                    category: 'Clothing',
-                    quantity: 25,
-                    inventoryStatus: 'INSTOCK',
-                    rating: 5
-                },
-                {
-                    id: '1004',
-                    code: 'h456wer53',
-                    name: 'Bracelet',
-                    description: 'Product Description',
-                    image: 'bracelet.jpg',
-                    price: 15,
-                    category: 'Accessories',
-                    quantity: 73,
-                    inventoryStatus: 'INSTOCK',
-                    rating: 4
-                },
-                {
-                    id: '1005',
-                    code: 'av2231fwg',
-                    name: 'Brown Purse',
-                    description: 'Product Description',
-                    image: 'brown-purse.jpg',
-                    price: 120,
-                    category: 'Accessories',
-                    quantity: 0,
-                    inventoryStatus: 'OUTOFSTOCK',
-                    rating: 4
-                }]
+                deep: true
             }
         },
         mounted() {
@@ -348,8 +342,7 @@
                 try {
                     const response = await api.get("Perfiles/GetVistas");
                     
-                    this.vistas = response.data;
-                    console.log(this.vistas);
+                    this.vistas = Object.assign(response.data);
                 } 
                 catch (error) {
                     this.toast.error("Error 500. Error al cargar las vistas.", this.toastProperties);
@@ -361,34 +354,96 @@
             showDetails(idPerfil) {
                 const model = this.perfiles.find(item => item.idPerfil === idPerfil);
                 this.actualDetails = model;
-                console.log(model);
 
                 if (model.Vistas != null) {
-                    console.log(model.Vistas);
-                    this.vistasDisponibles = model.Vistas.filter(vista => !vista.Permiso);
-                    this.vistasAsignadas = model.Vistas.filter(vista => vista.Permiso);
-                    this.vistasSeleccionadas = this.vistasAsignadas;
-                    console.log(this.vistasDisponibles, this.vistasAsignadas);
-                }
-                else{
-                    this.vistasDisponibles = this.vistas;
-                    this.vistasAsignadas = [];
+                    this.vistasDisponibles[0] = model.Vistas.filter(x => x.Permiso == false);
+                    this.vistasDisponibles[1] = model.Vistas.filter(x => x.Permiso == true);
                 }
 
-                this.actualDetails = model;
+                Object.assign(this.actualDetails, model);
                 this.perfilDetailsVisible = true;
             },
-            eliminarDisponiblesSeleccionados() {
-                this.vistasDisponibles = this.vistasDisponibles.filter(
-                    vista => !this.vistasSeleccionadas.includes(vista)
-                );
+            newProfile() {
+                this.vistasDisponibles[0] = this.vistas;
+                this.vistasDisponibles[1] = [];
+
+                this.perfilNewVisible = true;
             },
-            eliminarAsignadosSeleccionados() {
-            // eliminar las vistas seleccionadas de la lista de asignados
-                this.vistasAsignadas = this.vistasAsignadas.filter(
-                    vista => !this.vistasSeleccionadas.includes(vista)
-                );
-            }
+            saveEditingProfile(model, vistas) {
+                this.loading = true;
+                
+                if (vistas.length == 0) {
+                    model.Vistas = null;
+                }
+                else {
+                    for (let i = 0; i < vistas.length; i++) {
+                        vistas[i].Permiso = true;
+                    }
+
+                    model.Vistas = vistas;
+                }
+                
+                console.log(model);
+
+                try {
+                    api.put('Perfiles?idPerfil=' + model.idPerfil, model)
+                        .then(response => {
+                            console.log(response);
+                            if (response.data.Success) {
+                                this.sinGuardar = false;
+                                this.toast.success(response.data.Message, this.$store.state.defaultToastOptions);
+                                this.cargarPerfiles();
+                            }
+                            else {
+                                console.log(response.data);
+                                this.toast.warning(response.data.Message, this.$store.state.defaultToastOptions);
+                            }
+                        })
+                }
+
+                catch (error) {
+                    this.loading = false;
+                    console.log(error);
+                    this.toast.error("Error 500. Error al realizar la operación.", this.$store.state.defaultToastOptions);
+                }     
+
+                this.loading = false;
+                this.perfilDetailsVisible = false;
+            },
+            saveNewProfile(model, vistas) {
+                this.loading = true;
+
+                for (let i = 0; i < vistas.length; i++) {
+                    vistas[i].Permiso = true;
+                }
+
+                model.Vistas = vistas;
+                console.log(model);
+
+                try {
+                    api.post('Perfiles', model)
+                        .then(response => {
+                            console.log(response);
+                            if (response.data.Success) {
+                                this.toast.success(response.data.Message, this.$store.state.defaultToastOptions);
+                            }
+                            else {
+                                console.log(response.data);
+                                this.toast.warning(response.data.Message, this.$store.state.defaultToastOptions);
+                            }
+                        })
+                }
+
+                catch (error) {
+                    this.loading = false;
+                    console.log(error);
+                    this.toast.error("Error 500. Error al realizar la operación.", this.$store.state.defaultToastOptions);
+                }     
+
+                this.loading = false;
+                this.perfilNewVisible = false;
+                this.cargarPerfiles();
+            },
         }
     }
 </script>
