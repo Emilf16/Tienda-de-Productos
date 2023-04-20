@@ -5,7 +5,11 @@ import PagarProducto from "../components/PagarProducto.vue";
 import GestionarStock from "../views/admin/GestionarStock.vue";
 import GestionarUsuarios from "../views/admin/GestionarUsuarios.vue";
 import GestionarRoles from "../views/admin/GestionarRoles.vue";
+ 
+import GestionarPedidos from "../views/admin/GestionarPedidos.vue";
+ 
 import GestionarCategorias from "../views/admin/GestionarCategorias.vue";
+ 
 import MiPerfil from "../views/cliente/MiPerfil.vue";
 import MisPedidos from "../views/cliente/MisPedidos.vue";
 import PantallaLogin from "../views/PantallaLogin.vue";
@@ -62,8 +66,19 @@ const routes = [
     },
   },
   {
+ 
+    path: "/gestionarPedidos",
+    name: "GestionarPedidos",
+    component: GestionarPedidos,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+ 
     path: "/gestionarPerfiles",
     name: "GestionarPerfiles",
+ 
     component: GestionarRoles,
     meta: {
       requiresAuth: true,

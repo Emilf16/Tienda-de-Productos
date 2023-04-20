@@ -74,13 +74,50 @@
             value="productos"
           ></v-list-item
         ></router-link>
+ 
+        <!-- ver carrito -->
+        <router-link
+          to="/carritoCompras"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+            prepend-icon="mdi-cart-outline"
+            title="Carrito"
+            value="carrito"
+          ></v-list-item
+        ></router-link>
+
+        <!-- Categorias -->
+        <router-link
+          to="/pantallaCategorias"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+            prepend-icon="mdi-shopping"
+            title="Categorias"
+            value="categoria"
+          ></v-list-item
+        ></router-link>
+
+        <!-- gestionar productos -->
+        <router-link
+          to="/gestionarStock"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+            prepend-icon="mdi-cart-arrow-down"
+            title="Inventario"
+            value="stock"
+          ></v-list-item
+        ></router-link>
+
+        <!-- gestionar Usuario -->
+ 
         <router-link
           to="/gestionarCategorias"
           style="text-decoration: none; color: inherit"
           ><v-list-item
+ 
             prepend-icon="mdi-view-dashboard"
             title="categ"
-            value="categ"
+            value="categ" 
           ></v-list-item
         ></router-link>
         <router-link
@@ -89,9 +126,20 @@
           :to="vista.URL"
           style="text-decoration: none; color: inherit"
           ><v-list-item
+ 
             prepend-icon="mdi-view-dashboard"
             :title="vista.Vista"
-            :value="vista.DescVista"
+            :value="vista.DescVista" 
+          ></v-list-item
+        ></router-link>
+        <!-- gestionar Pedidos -->
+        <router-link
+          to="/gestionarPedidos"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+            prepend-icon="mdi-package-variant"
+            title="Pedidos"
+            value="gestionPedidos"
           ></v-list-item
         ></router-link>
       </v-list>

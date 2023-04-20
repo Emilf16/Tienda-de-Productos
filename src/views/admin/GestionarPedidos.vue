@@ -29,6 +29,7 @@
 </style>
 
 <template>
+    <ConfirmDialog></ConfirmDialog>
     <v-container fluid class="mainContainer">
         <v-breadcrumbs :items="breadCrumb">
             <template v-slot:prepend>
@@ -40,9 +41,12 @@
             <v-col cols="12" sm="12" lg="12" class="colsContainer">
                 <div class="containerCols">
                     <div class="content">
-                        <h1 class="pageTitle">Mis pedidos</h1>
+                        <h1 class="pageTitle">Gestionar Pedidos</h1>
                         <div>
-                            <DataTable ref="dt" v-model:expandedRows="expandedRows"  v-model:filters="filters" :value="pedidos" resizableColumns columnResizeMode="fit" removableSort tableStyle="min-width: 50rem" paginator :rows="10" dataKey="id" :loading="loading">
+                            <DataTable ref="dt" v-model:expandedRows="expandedRows"  v-model:filters="filters" :value="pedidos" 
+                            resizableColumns columnResizeMode="fit" removableSort tableStyle="min-width: 50rem" 
+                            paginator :rows="10" dataKey="id" :loading="loading"
+                            editMode="cell" @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete" tableClass="editable-cells-table">
                                 <template #header>
                                     <div class="flex justify-content-between">
                                         <Button icon="pi pi-external-link" label="Exportar" severity="warning" @click="exportCSV($event)" />
@@ -53,9 +57,30 @@
                                     </div>
                                 </template>
                                 <Column field="idPedido" header="# de Pedido" sortable ></Column>
-                                <Column field="Estado" header="Estado" sortable >
+                                <Column field="NombreUsuario" header="Usuario" sortable ></Column>
+                                <Column field="Estado" header="Estado" sortable style="width: 10%">
+                                    <template #editor>
+                                        <Dropdown v-model="selectedEstatus" :options="statuses" optionLabel="idEstado" class="w-full">
+                                            <template #value="slotProps">
+                                                <Tag :value="slotProps.value.Nombre" :icon="getIcon(slotProps.value.Nombre)" :severity="getSeverity(slotProps.value.Nombre)" />
+                                            </template>
+                                            <template #option="slotProps">
+                                                <Tag :value="slotProps.option.Nombre" :icon="getIcon(slotProps.option.Nombre)" :severity="getSeverity(slotProps.option.Nombre)" />
+                                            </template>
+<!-- 
+                                            <template #option="{ option }">
+                                                <Tag :value="option.Nombre" :icon="getIcon(option.Nombre)" :severity="getSeverity(option.Nombre)" />
+                                            </template> -->
+                                        </Dropdown>
+                                    </template>
                                     <template #body="{ data }">
-                                        <Tag :value="data.Estado" :icon="getIcon(data.Estado)" :severity="getSeverity(data.Estado)" />
+                                        <Tag :value="data.Estado" :icon="getIcon(data.Estado)" :severity="getSeverity(data.Estado)" style="cursor: pointer">
+                                            <span class="p-tag-value">{{ data.Estado }}</span>
+                                            <v-tooltip
+                                                activator="parent"
+                                                location="top"
+                                                >Cambiar estado</v-tooltip>
+                                        </Tag>
                                     </template>
                                 </Column>
                                 <Column field="MontoPagado" header="Monto total" sortable>
@@ -63,7 +88,7 @@
                                         {{formatCurrency(data.MontoPagado)}}
                                     </template>
                                 </Column>
-                                <Column header="Cantidad de Productos" sortable>
+                                <Column header="Cant. de Productos" sortable>
                                     <template #body="{ data }">
                                         {{(data.Carrito.Productos).length}}
                                     </template>
@@ -133,12 +158,16 @@
     import Rating from 'primevue/rating'
     import Button from 'primevue/button'
     import Dialog from 'primevue/dialog'
+    import Dropdown from 'primevue/dropdown';
     import 'primeicons/primeicons.css';
+    import { useConfirm } from "primevue/useconfirm";
+    import ConfirmDialog from 'primevue/confirmdialog';
 
     export default {
         setup() {
             const toast = useToast();
-            return { toast }
+            const confirm = useConfirm();
+            return { confirm, toast  }
         },
         
         name: 'MyDataTable',
@@ -149,7 +178,9 @@
             Tag,
             Rating,
             Button,
-            Dialog
+            Dialog,
+            Dropdown,
+            ConfirmDialog
         },
 
         data() {
@@ -158,7 +189,7 @@
                     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                     status: { value: null, matchMode: FilterMatchMode.EQUALS },
                 },
-                statuses: ['En progreso', 'Enviado', 'Entregado', 'Retenido'],
+                statuses: [],
                 loading: true,
                 toastProperties: this.$store.state.defaultToastProperties,
                 breadCrumb: [
@@ -168,14 +199,18 @@
                         href: '/',
                     },
                     {
-                        title: 'Mis pedidos',
+                        title: 'Administración',
                         disabled: true,
-                        href: '/Pedidos',
+                        href: '/',
+                    },
+                    {
+                        title: 'Pedidos',
+                        disabled: true,
+                        href: '/gestionarPedidos',
                     },
                 ],
                 pageLoaded: false,
                 token: localStorage.getItem('token'),
-                user: {},
                 pedidos: [],
                 expandedRows: [],
                 actualDetails: {
@@ -184,20 +219,15 @@
                         Productos: []
                     }
                 },
+                selectedEstatus: "Procesando",
                 detailsVisible: false,
             }
         },
         mounted() {
             if (!this.pageLoaded) {
-                api.get('Account')
-                    .then(data => {
-                        this.user = data.data.usuario;
-                        this.cargarPedidos();
-                        this.pageLoaded = true;
-                    })
-                    .catch(error => {
-                        this.toast.error("Error 500. " + error, this.toastProperties);
-                    });
+                this.cargarPedidos();
+                this.cargarEstatus();
+                this.pageLoaded = true;
             }
         },
         methods: {
@@ -205,7 +235,7 @@
                 try {
                     this.loading = true;
 
-                    const response = await api.get("Pedidos/GetPedidosUsuarios?idUsuario=" + this.user.idUsuario);
+                    const response = await api.get("Pedidos");
                     
                     console.log(response.data);
                     this.pedidos = response.data;
@@ -216,6 +246,22 @@
                 } 
                 catch (error) {
                     this.toast.error("Error 500. Error al cargar los pedidos.", this.toastProperties);
+                }
+            },
+            async cargarEstatus() {
+                try {
+                    this.loading = true;
+
+                    const response = await api.put("Pedidos/GetEstadosProductos");
+                    
+                    console.log(response.data);
+                    this.statuses = response.data;
+                    this.loading = false;
+                    
+                    // this.toast.success(response.data.Message, this.toastProperties);
+                } 
+                catch (error) {
+                    this.toast.error("Error 500. Error al cargar los estatus de los pedidos.", this.toastProperties);
                 }
             },
             formatDate(value) {
@@ -272,13 +318,54 @@
             collapseRow(row) {
                 const index = this.expandedRows.findIndex(r => r === row);
                 if (index !== -1) {
-                this.expandedRows.splice(index, 1);
+                    this.expandedRows.splice(index, 1);
                 }
             },
             showDetails(idPedido){
                 const model = this.pedidos.find(item => item.idPedido === idPedido);
                 this.actualDetails.Carrito = model.Carrito;
                 this.detailsVisible = true;
+            },
+            onEditInit(event) {
+                event.cellElement.querySelector('.p-dropdown').click();
+            },
+            onCellEditInit(event) {
+                this.selectedEstatus = this.statuses.find(item => item.idEstado === event.data.idEstado);
+                console.log(event);
+            },
+            onCellEditComplete(event) {
+                this.confirmChangeStatus(event);
+                
+            },
+            confirmChangeStatus(event) {
+                this.confirm.require({
+                    message: '¿Estás seguro de que quieres cambiar el Estado del pedido?',
+                    header: 'Confirmación',
+                    icon: 'pi pi-exclamation-triangle',
+                    accept: () => {
+                        this.pedidos[event.index].idEstado = this.selectedEstatus.idEstado;
+                        this.pedidos[event.index].Estado = this.selectedEstatus.Nombre;
+
+                        const model = this.pedidos[event.index];
+
+                        api.put('Pedidos/CambiarEstado?idPedido=' + model.idPedido + '&idEstado=' + model.idEstado)
+                        .then(response => {
+                            console.log(response);
+                            if (response.data.Success) {
+                                this.sinGuardar = false;
+                                this.toast.success(response.data.Message, this.$store.state.defaultToastOptions);
+                                this.cargarPerfiles();
+                            }
+                            else {
+                                console.log(response.data);
+                                this.toast.warning(response.data.Message, this.$store.state.defaultToastOptions);
+                            }
+                        })
+                    },
+                    reject: () => {
+                        // reject
+                    }
+                });
             },
         }
     }
