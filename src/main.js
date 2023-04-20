@@ -1,30 +1,29 @@
-
-import App from './App.vue'
-import router from './router'
-import vuetify from './plugins/vuetify'
-import { loadFonts } from './plugins/webfontloader'
-import PrimeVue from 'primevue/config';
-import { createApp } from 'vue'
-import { createStore } from 'vuex'
+import App from "./App.vue";
+import router from "./router";
+import vuetify from "./plugins/vuetify";
+import { loadFonts } from "./plugins/webfontloader";
+import PrimeVue from "primevue/config";
+import { createApp } from "vue";
+import { createStore } from "vuex";
 import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import { FilterMatchMode } from 'primevue/api';
-import VueCreditCardValidation from 'vue-credit-card-validation';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { FilterMatchMode } from "primevue/api";
+import VueCreditCardValidation from "vue-credit-card-validation";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+// import InputNumber from 'primevue/inputnumber';
 
-import 'primeflex/primeflex.min.css';
-import 'primeicons/primeicons.css';
-import 'primevue/resources/primevue.min.css';
-import 'primevue/resources/themes/saga-blue/theme.css';
-import 'primevue/resources/themes/fluent-light/theme.css';
+import "primeflex/primeflex.min.css";
+import "primeicons/primeicons.css";
+import "primevue/resources/primevue.min.css";
+import "primevue/resources/themes/saga-blue/theme.css";
+import "primevue/resources/themes/fluent-light/theme.css";
 
-loadFonts()
+loadFonts();
 
 const store = createStore({
   state() {
     return {
-      productosCarrito: [],
       estaLogueado: false,
       userName: "",
       defaultToastOptions: {
@@ -38,25 +37,20 @@ const store = createStore({
         hideProgressBar: true,
         closeButton: "button",
         icon: true,
-        rtl: false
+        rtl: false,
       },
-    }
+    };
   },
   mutations: {
-
-    agregarNuevoProducto(state, producto) {
-      state.productosCarrito.push(producto)
-    },
     mostrarTienda(state, token) {
       if (token == null) {
         state.estaLogueado = false;
-      }
-      else {
+      } else {
         state.estaLogueado = true;
       }
-    }
-  }
-})
+    },
+  },
+});
 
 createApp(App)
   .use(router)
@@ -69,7 +63,7 @@ createApp(App)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
     maxToasts: 20,
-    newestOnTop: true
+    newestOnTop: true,
   })
-  .component('font-awesome-icon', FontAwesomeIcon)
-  .mount('#app')
+  .component("font-awesome-icon", FontAwesomeIcon)
+  .mount("#app");

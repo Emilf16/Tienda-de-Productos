@@ -1,347 +1,714 @@
-<template >
-  <v-container fluid>
-    <!-- <v-card elevation="8">
-            <v-card-title>
-                Stock de Productos
-            </v-card-title>
-        </v-card> -->
-    <v-btn color="primary" dark class="mb-2" @click="addProduct(product)">
-      New Item
-    </v-btn>
-    <v-row>
+<template>
+  <v-container fluid class="mainContainer">
+    <v-col>
+      <v-breadcrumbs :items="breadCrumb">
+        <template v-slot:prepend>
+          <v-icon size="small" icon="mdi-home"></v-icon>
+        </template>
+      </v-breadcrumbs>
 
-      <v-col v-for="(product, index) in products" v-bind:key="index" v-bind:product="product" class="pa-0 mb-3" cols="12"
-        lg="3" md="4" sm="6" xs="12">
-        <v-card class="mx-auto my-2" color="#ffffff" theme="light" elevation="4" max-width="450px">
-          <v-avatar class="ma-4"
-            size="180
-                                                                                                                                                  "
-            rounded="0" cols="12" lg="12" md="12" sm="12" xs="12">
+      <v-row class="rowContainer">
+        <v-col cols="12" sm="12" lg="12" class="colsContainer">
+          <div class="containerCols">
+            <div class="content">
+              <v-row>
+                <h1 class="pageTitle">Inventario</h1>
+                <v-spacer></v-spacer>
+                <v-btn @click="agregarProducto()" elevation="0"
+                  ><v-icon>mdi-cart-plus</v-icon></v-btn
+                >
+              </v-row>
 
-            <v-img v-bind:src="product.strCategoryThumb" v-bind:alt="product.strCategory"></v-img>
-          </v-avatar>
+              <div>
+                <DataTable
+                  ref="dt"
+                  v-model:expandedRows="expandedRows"
+                  v-model:filters="filters"
+                  :value="listaProductos"
+                  resizableColumns
+                  columnResizeMode="fit"
+                  removableSort
+                  tableStyle="min-width: 50rem"
+                  paginator
+                  :rows="10"
+                  dataKey="id"
+                  :loading="loading"
+                >
+                  <template #header>
+                    <div class="flex justify-content-between">
+                      <v-spacer></v-spacer>
+                      <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText
+                          v-model="filters['global'].value"
+                          placeholder="Buscar..."
+                        />
+                      </span>
+                    </div>
+                  </template>
 
-          <v-card-title class="text-h5"> {{ product.strCategory }}</v-card-title>
+                  <!-- NOMBRE ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column field="Nombre" header="Nombre" sortable></Column>
 
-          <v-card-text class="text-h5"> RD${{ product.precio }}</v-card-text>
-          <v-card-text class="text-h5"> Cantidad: {{ product.stock }}</v-card-text>
-          <v-card-text class=" mt-5" color="#000000"
-            style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal;">
-            {{ product.strCategoryDescription }}</v-card-text>
+                  <!-- FOTO ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column field="Foto" header="Imagen">
+                    <template #body="{ data }">
+                      <Image
+                        preview
+                        :src="data.FotoUrl"
+                        class="shadow-2 border-round"
+                        width="64"
+                        height="64"
+                        objectFit="contain"
+                      />
+                    </template>
+                  </Column>
 
-          <v-card-actions>
-            <!-- funciones agregar-eliminar-ver -->
-            <v-btn color="#BE1D1D" variant="flat" text @click="elimiarProducto(product)">
-              <span style="color:white">
-                Eliminar
-              </span>
-            </v-btn>
-            <v-btn color="#008F39" variant="flat" text @click="editProduct(product)">
-              <span style="color:white">
-                Actualizar
-              </span>
-            </v-btn>
+                  <!-- PRECIO ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column field="Precio" header="Precio" sortable>
+                    <template #body="{ data }">
+                      {{ formatCurrency(data.Precio) }}
+                    </template>
+                  </Column>
 
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+                  <!-- FECHA COMPRA ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column
+                    field="FechaIngreso"
+                    header="Fecha de compra"
+                    sortable
+                  >
+                    <template #body="{ data }">
+                      {{ formatDate(data.FechaIngreso) }}
+                    </template>
+                  </Column>
 
-    <v-dialog v-model="dialog" max-width="900px">
-      <v-card>
-        <v-card-title style="margin-top: 20px; margin-left: 24px;">
-          <span class="text-h5">{{ formTitle }}</span>
-        </v-card-title>
+                  <!-- CATEGORIAS ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column header="Categorias">
+                    <template #body="{ data }">
+                      <div>
+                        <Chip
+                          class="mx-1"
+                          v-for="categoria in data.Categorias"
+                          :key="categoria"
+                          :label="categoria.Nombre"
+                        />
+                      </div>
+                    </template>
+                  </Column>
 
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field v-model="editedProduct.strCategory" label="Nombre"></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field v-model="editedProduct.precio" label="Precio"></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field v-model="editedProduct.stock" label="Stock"></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field v-model="editedProduct.strCategoryDescription" label="Descripción"></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field v-model="editedProduct.strCategoryThumb" label="Foto"></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="#BE1D1D" variant="flat" @click="cancelar()">
-            <span style="color:white">
-              Cancelar
+                  <!-- RATING ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column header="Rating" sortable style="min-width: 12rem">
+                    <template #body="{ data }">
+                      <Rating
+                        :modelValue="data.Valoracion"
+                        :readonly="true"
+                        :cancel="false"
+                      />
+                    </template>
+                  </Column>
+
+                  <!-- ESTADO ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column header="Estado" sortable style="min-width: 12rem">
+                    <template #body="{ data }">
+                      <Tag
+                        :value="getStockLabel(data.CantidadStock)"
+                        :severity="getStock(data.CantidadStock)"
+                      />
+                    </template>
+                  </Column>
+
+                  <!-- OPCIONES ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column
+                    header="Opciones"
+                    styleClass="col-icon"
+                    :expander="true"
+                    style="width: 5rem"
+                  >
+                    <template #body="{ data, index }">
+                      <Button
+                        icon="pi pi-pencil"
+                        text
+                        rounded
+                        aria-label="Bookmark"
+                        @click="editarProducto(data, index)"
+                      />
+                      <Button
+                        icon="pi pi-trash"
+                        outlined
+                        rounded
+                        severity="danger"
+                        @click="deshabilitarProducto(data, index)"
+                      />
+                    </template>
+                  </Column>
+                </DataTable>
+              </div>
+            </div>
+          </div>
+        </v-col>
+      </v-row>
+    </v-col>
+
+    <!-- DIALOGO PARA EDITAR PRODUCTOS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <Dialog
+      v-model:visible="productoDialog"
+      :style="{ width: '100vh' }"
+      :modal="true"
+      class="p-fluid"
+      :header="formTitle"
+    >
+      <div class="field">
+        <label for="Nombre">Nombre</label>
+        <InputText
+          id="Nombre"
+          v-model.trim="editedProduct.Nombre"
+          required="true"
+          autofocus
+          :class="{ 'p-invalid': submitted && !editedProduct.Nombre }"
+        />
+        <small class="p-error" v-if="submitted && !editedProduct.Nombre"
+          >El Nombre es requerido.</small
+        >
+      </div>
+      <div class="field">
+        <label for="description">Descripción</label>
+        <Textarea
+          id="description"
+          v-model="editedProduct.Descripcion"
+          required="true"
+          rows="3"
+          cols="20"
+        />
+      </div>
+      <template v-if="editedProduct.FotoUrl">
+        <div class="card flex justify-content-center">
+          <Image
+            :src="`${editedProduct.FotoUrl}`"
+            :alt="`${editedProduct.FotoUrl}`"
+            width="250"
+            preview
+          />
+        </div>
+      </template>
+      <template v-else>
+        <div class="card flex justify-content-center">
+          <Image
+            src="https://ecomworld.shop/uploads/default-product.png"
+            width="250"
+            preview
+          />
+        </div>
+      </template>
+      <div class="field">
+        <label for="FotoUrl">Link de la Foto</label>
+        <InputText
+          id="Nombre"
+          v-model.trim="editedProduct.FotoUrl"
+          required="true"
+          autofocus
+          :class="{ 'p-invalid': submitted && !editedProduct.FotoUrl }"
+        />
+      </div>
+
+      <div class="field">
+        <MultiSelect
+          v-model="editedProduct.Categorias"
+          :options="listaCategorias"
+          filter
+          optionLabel="Nombre"
+          placeholder="Categorias"
+          :maxSelectedLabels="3"
+          class="w-full md:w-20rem"
+          display="chip"
+        />
+      </div>
+
+      <!-- <div class="field">
+        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
+        <Dropdown
+          id="inventoryStatus"
+          v-model="product.inventoryStatus"
+          :options="statuses"
+          optionLabel="label"
+          placeholder="Select a Status"
+        >
+          <template #value="slotProps">
+            <div v-if="slotProps.value && slotProps.value.value">
+              <Tag
+                :value="slotProps.value.value"
+                :severity="getStatusLabel(slotProps.value.label)"
+              />
+            </div>
+            <div v-else-if="slotProps.value && !slotProps.value.value">
+              <Tag
+                :value="slotProps.value"
+                :severity="getStatusLabel(slotProps.value)"
+              />
+            </div>
+            <span v-else>
+              {{ slotProps.placeholder }}
             </span>
-          </v-btn>
-          <v-btn color="#008F39" variant="flat" @click="save()">
-            <span style="color:white">
-              Guardar
-            </span>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="dialogDelete" max-width="600px">
-      <v-card>
-        <v-card-title class="text-h5" style="text-align:center">¿Está seguro que desea eliminar este
-          producto?</v-card-title>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="#BE1D1D" variant="flat" @click="closeDelete">
-            <span style="color:white">
-              Cancelar
-            </span>
-          </v-btn>
-          <v-btn color="#008F39" variant="flat" @click="deleteItemConfirm">
-            <span style="color:white">
-              Confirmar
-            </span>
-          </v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
+          </template>
+        </Dropdown>
+      </div> -->
 
-      </v-card>
-    </v-dialog>
+      <!-- <div class="field">
+        <label class="mb-3">Category</label>
+        <div class="formgrid grid">
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category1"
+              name="category"
+              value="Accessories"
+              v-model="product.category"
+            />
+            <label for="category1">Accessories</label>
+          </div>
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category2"
+              name="category"
+              value="Clothing"
+              v-model="product.category"
+            />
+            <label for="category2">Clothing</label>
+          </div>
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category3"
+              name="category"
+              value="Electronics"
+              v-model="product.category"
+            />
+            <label for="category3">Electronics</label>
+          </div>
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category4"
+              name="category"
+              value="Fitness"
+              v-model="product.category"
+            />
+            <label for="category4">Fitness</label>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="formgrid grid">
+        <div class="field col">
+          <label for="price">Precio</label>
+          <InputNumber
+            id="price"
+            v-model="editedProduct.Precio"
+            mode="currency"
+            currency="USD"
+            locale="en-US"
+          />
+        </div>
+        <div class="field col">
+          <label for="quantity">Cantidad</label>
+          <InputNumber
+            id="quantity"
+            v-model="editedProduct.CantidadStock"
+            integeronly
+          />
+        </div>
+      </div>
+      <template #footer>
+        <div style="height: 30px">
+          <Button
+            label="Cancelar"
+            icon="pi pi-times"
+            text
+            @click="closeEditar()"
+          />
+          <Button
+            label="Guardar"
+            icon="pi pi-check"
+            text
+            @click="guardarProductos(editedProduct)"
+          />
+        </div>
+      </template>
+    </Dialog>
+
+    <!-- DIALOGO PARA DESHABILITAR PRODUCTOS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <Dialog
+      v-model:visible="deshabilitarDialog"
+      modal
+      header="Deshabilitar Productos"
+      :style="{ width: '50vw' }"
+    >
+      <v-card-title class="text-h5" style="text-align: center"
+        >¿Está seguro que desea eliminar este producto?</v-card-title
+      >
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="#BE1D1D" variant="flat" @click="closeDeshabilitar()">
+          <span style="color: white"> Cancelar </span>
+        </v-btn>
+        <v-btn color="#008F39" variant="flat" @click="confirmDeshabilitar()">
+          <span style="color: white"> Confirmar </span>
+        </v-btn>
+        <v-spacer></v-spacer>
+      </v-card-actions>
+    </Dialog>
   </v-container>
 </template>
-   
 
 <script>
+import Chip from "primevue/chip";
+import { useToast } from "vue-toastification";
+import api from "../../utilities/api";
+import DataTable from "primevue/datatable";
+// import Image from "primevue/image";
+import Textarea from "primevue/textarea";
+import InputText from "primevue/inputtext";
+import Column from "primevue/column";
+import { FilterMatchMode } from "primevue/api";
+import Tag from "primevue/tag";
+import Rating from "primevue/rating";
+import Button from "primevue/button";
+import Dialog from "primevue/dialog";
+import InputNumber from "primevue/inputnumber";
+import "primeicons/primeicons.css";
+import Image from "primevue/image";
+import MultiSelect from "primevue/multiselect";
+
 export default {
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
+  components: {
+    InputNumber,
+    DataTable,
+    MultiSelect,
+    Column,
+    InputText,
+    Tag,
+    Chip,
+    Rating,
+    Textarea,
+    Button,
+    Dialog,
+    Image,
+  },
   data() {
     return {
-      products: [
-        {
-          idCategory: "1",
-          strCategory: "Beef",
-          precio: 30.95,
-          stock: 20,
-          strCategoryThumb: "https://www.themealdb.com/images/category/beef.png",
-          strCategoryDescription: "Beef is the culinary name for meat from cattle, particularly skeletal muscle. Humans have been eating beef since prehistoric times.[1] Beef is a source of high-quality protein and essential nutrients.[2]"
-        },
-        {
-          idCategory: "2",
-          strCategory: "Chicken",
-          precio: 24.80,
-          stock: 12,
-          strCategoryThumb: "https://www.themealdb.com/images/category/chicken.png",
-          strCategoryDescription: "Chicken is a type of domesticated fowl, a subspecies of the red junglefowl. It is one of the most common and widespread domestic animals, with a total population of more than 19 billion as of 2011.[1] Humans commonly keep chickens as a source of food (consuming both their meat and eggs) and, more rarely, as pets."
-        },
-        {
-          idCategory: "3",
-          strCategory: "Dessert",
-          precio: 90.00,
-          stock: 50,
-          strCategoryThumb: "https://www.themealdb.com/images/category/dessert.png",
-          strCategoryDescription: "Dessert is a course that concludes a meal. The course usually consists of sweet foods, such as confections dishes or fruit, and possibly a beverage such as dessert wine or liqueur, however in the United States it may include coffee, cheeses, nuts, or other savory items regarded as a separate course elsewhere. In some parts of the world, such as much of central and western Africa, and most parts of China, there is no tradition of a dessert course to conclude a meal.\r\n\r\nThe term dessert can apply to many confections, such as biscuits, cakes, cookies, custards, gelatins, ice creams, pastries, pies, puddings, and sweet soups, and tarts. Fruit is also commonly found in dessert courses because of its naturally occurring sweetness. Some cultures sweeten foods that are more commonly savory to create desserts."
-        },
-        {
-          idCategory: "4",
-          strCategory: "Lamb",
-          precio: 99.99,
-          stock: 15,
-          strCategoryThumb: "https://www.themealdb.com/images/category/lamb.png",
-          strCategoryDescription: "Lamb, hogget, and mutton are the meat of domestic sheep (species Ovis aries) at different ages.\r\n\r\nA sheep in its first year is called a lamb, and its meat is also called lamb. The meat of a juvenile sheep older than one year is hogget; outside the USA this is also a term for the living animal. The meat of an adult sheep is mutton, a term only used for the meat, not the living animals. The term mutton is almost always used to refer to goat meat in the Indian subcontinent.\r\n\r\n"
-        },
-        {
-          idCategory: "5",
-          strCategory: "Miscellaneous",
-          precio: 99.99,
-          stock: 15,
-          strCategoryThumb: "https://www.themealdb.com/images/category/miscellaneous.png",
-          strCategoryDescription: "General foods that don't fit into another category"
-        },
-        {
-          idCategory: "6",
-          strCategory: "Pasta",
-          precio: 99.99,
-          stock: 15,
-          strCategoryThumb: "https://www.themealdb.com/images/category/pasta.png",
-          strCategoryDescription: "Pasta is a staple food of traditional Italian cuisine, with the first reference dating to 1154 in Sicily.\r\n\r\nAlso commonly used to refer to the variety of pasta dishes, pasta is typically a noodle made from an unleavened dough of a durum wheat flour mixed with water or eggs and formed into sheets or various shapes, then cooked by boiling or baking. As an alternative for those wanting a different taste, or who need to avoid products containing gluten, some pastas can be made using rice flour in place of wheat.[3][4] Pastas may be divided into two broad categories, dried (pasta secca) and fresh (pasta fresca)."
-        },
-        {
-          idCategory: "7",
-          strCategory: "Pork",
-          precio: 99.99,
-          stock: 15,
-          strCategoryThumb: "https://www.themealdb.com/images/category/pork.png",
-          strCategoryDescription: "Pork is the culinary name for meat from a domestic pig (Sus scrofa domesticus). It is the most commonly consumed meat worldwide,[1] with evidence of pig husbandry dating back to 5000 BC. Pork is eaten both freshly cooked and preserved. Curing extends the shelf life of the pork products. Ham, smoked pork, gammon, bacon and sausage are examples of preserved pork. Charcuterie is the branch of cooking devoted to prepared meat products, many from pork.\r\n\r\nPork is the most popular meat in Eastern and Southeastern Asia, and is also very common in the Western world, especially in Central Europe. It is highly prized in Asian cuisines for its fat content and pleasant texture. Consumption of pork is forbidden by Jewish and Muslim dietary law, a taboo that is deeply rooted in tradition, with several suggested possible causes. The sale of pork is limited in Israel and illegal in certain Muslim countries."
-        },
-        {
-          idCategory: "8",
-          strCategory: "Seafood",
-          precio: 99.99,
-          stock: 15,
-          strCategoryThumb: "https://www.themealdb.com/images/category/seafood.png",
-          strCategoryDescription: "Seafood is any form of sea life regarded as food by humans. Seafood prominently includes fish and shellfish. Shellfish include various species of molluscs, crustaceans, and echinoderms. Historically, sea mammals such as whales and dolphins have been consumed as food, though that happens to a lesser extent in modern times. Edible sea plants, such as some seaweeds and microalgae, are widely eaten as seafood around the world, especially in Asia (see the category of sea vegetables). In North America, although not generally in the United Kingdom, the term \"seafood\" is extended to fresh water organisms eaten by humans, so all edible aquatic life may be referred to as seafood. For the sake of completeness, this article includes all edible aquatic life."
-        },
-        {
-          idCategory: "9",
-          strCategory: "Side",
-          precio: 150.00,
-          stock: 5,
-          strCategoryThumb: "https://www.themealdb.com/images/category/side.png",
-          strCategoryDescription: "A side dish, sometimes referred to as a side order, side item, or simply a side, is a food item that accompanies the entrée or main course at a meal. Side dishes such as salad, potatoes and bread are commonly used with main courses throughout many countries of the western world. New side orders introduced within the past decade[citation needed], such as rice and couscous, have grown to be quite popular throughout Europe, especially at formal occasions (with couscous appearing more commonly at dinner parties with Middle Eastern dishes)."
-        },
-        {
-          idCategory: "10",
-          strCategory: "Starter",
-          precio: 79.99,
-          stock: 10,
-          strCategoryThumb: "https://www.themealdb.com/images/category/starter.png",
-          strCategoryDescription: "An entrée in modern French table service and that of much of the English-speaking world (apart from the United States and parts of Canada) is a dish served before the main course of a meal; it may be the first dish served, or it may follow a soup or other small dish or dishes. In the United States and parts of Canada, an entrée is the main dish or the only dish of a meal.\r\n\r\nHistorically, the entrée was one of the stages of the “Classical Order” of formal French table service of the 18th and 19th centuries. It formed a part of the “first service” of the meal, which consisted of potage, hors d’œuvre, and entrée (including the bouilli and relevé). The “second service” consisted of roast (rôti), salad, and entremets (the entremets sometimes being separated into a “third service” of their own). The final service consisted only of dessert.[3]:3–11 :13–25"
-        },
-        {
-          idCategory: "11",
-          strCategory: "Vegan",
-          precio: 19.99,
-          stock: 55,
-          strCategoryThumb: "https://www.themealdb.com/images/category/vegan.png",
-          strCategoryDescription: "Veganism is both the practice of abstaining from the use of animal products, particularly in diet, and an associated philosophy that rejects the commodity status of animals.[b] A follower of either the diet or the philosophy is known as a vegan (pronounced /ˈviːɡən/ VEE-gən). Distinctions are sometimes made between several categories of veganism. Dietary vegans (or strict vegetarians) refrain from consuming animal products, not only meat but also eggs, dairy products and other animal-derived substances.[c] The term ethical vegan is often applied to those who not only follow a vegan diet but extend the philosophy into other areas of their lives, and oppose the use of animals for any purpose.[d] Another term is environmental veganism, which refers to the avoidance of animal products on the premise that the harvesting or industrial farming of animals is environmentally damaging and unsustainable."
-        },
-        {
-          idCategory: "12",
-          strCategory: "Vegetarian",
-          precio: 29.99,
-          stock: 35,
-          strCategoryThumb: "https://www.themealdb.com/images/category/vegetarian.png",
-          strCategoryDescription: "Vegetarianism is the practice of abstaining from the consumption of meat (red meat, poultry, seafood, and the flesh of any other animal), and may also include abstention from by-products of animal slaughter.\r\n\r\nVegetarianism may be adopted for various reasons. Many people object to eating meat out of respect for sentient life. Such ethical motivations have been codified under various religious beliefs, as well as animal rights advocacy. Other motivations for vegetarianism are health-related, political, environmental, cultural, aesthetic, economic, or personal preference. There are variations of the diet as well: an ovo-lacto vegetarian diet includes both eggs and dairy products, an ovo-vegetarian diet includes eggs but not dairy products, and a lacto-vegetarian diet includes dairy products but not eggs. A vegan diet excludes all animal products, including eggs and dairy. Some vegans also avoid other animal products such as beeswax, leather or silk clothing, and goose-fat shoe polish."
-        },
-        {
-          idCategory: "13",
-          strCategory: "Breakfast",
-          precio: 59.99,
-          stock: 45,
-          strCategoryThumb: "https://www.themealdb.com/images/category/breakfast.png",
-          strCategoryDescription: "Breakfast is the first meal of a day. The word in English refers to breaking the fasting period of the previous night. There is a strong likelihood for one or more \"typical\", or \"traditional\", breakfast menus to exist in most places, but their composition varies widely from place to place, and has varied over time, so that globally a very wide range of preparations and ingredients are now associated with breakfast."
-        },
-        {
-          idCategory: "14",
-          strCategory: "Goat",
-          precio: 89.99,
-          stock: 34,
-          strCategoryThumb: "https://www.themealdb.com/images/category/goat.png",
-          strCategoryDescription: "The domestic goat or simply goat (Capra aegagrus hircus) is a subspecies of C. aegagrus domesticated from the wild goat of Southwest Asia and Eastern Europe. The goat is a member of the animal family Bovidae and the subfamily Caprinae, meaning it is closely related to the sheep. There are over 300 distinct breeds of goat. Goats are one of the oldest domesticated species of animal, and have been used for milk, meat, fur and skins across much of the world. Milk from goats is often turned into goat cheese."
-        }],
-      dialog: false,
+      listaProductos: [],
+      listaCategorias: [],
+      customers: null,
       editedIndex: -1,
+      formTitle: "",
+      productoDialog: false,
       dialogDelete: false,
+      deshabilitarDialog: false,
+      editedProduct: {},
+      categoriasSeleccionadas: [],
 
-      computed: {
-        formTitle() {
-          return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      defaultProduct: {},
+      filters: {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        status: { value: null, matchMode: FilterMatchMode.EQUALS },
+      },
+      loading: true,
+      toastProperties: this.$store.state.defaultToastProperties,
+      breadCrumb: [
+        {
+          title: "Home",
+          disabled: false,
+          href: "/",
         },
-      },
-
-      watch: {
-        dialogDelete(val) {
-          val || this.closeDelete()
+        {
+          title: "Gestionar Stock",
+          disabled: true,
+          href: "/gestionarStock",
         },
-      },
+      ],
+      pageLoaded: false,
+      token: localStorage.getItem("token"),
+      user: {},
+      expandedRows: [],
 
-      editedProduct: {
-        idCategory: '',
-        stock: 0,
-        precio: 0,
-        strCategory: '',
-        strCategoryThumb: '',
-        strCategoryDescription: '',
-      },
-      defaultProduct: {
-        idCategory: '',
-        stock: 0,
-        precio: 0,
-        strCategory: '',
-        strCategoryThumb: '',
-        strCategoryDescription: '',
-      },
+      detailsVisible: false,
+    };
+  },
+  mounted() {
+    if (!this.pageLoaded) {
+      api
+        .get("Account")
+        .then((data) => {
+          this.user = data.data.usuario;
+
+          this.getProductos();
+          this.getCategorias();
+          this.pageLoaded = true;
+        })
+        .catch((error) => {
+          this.toast.error("Error 500. " + error, this.toastProperties);
+        });
     }
   },
   methods: {
+    async print() {
+      console.log(this.categoriasSeleccionadas);
+    },
+    async getCategorias() {
+      try {
+        const response = await api.get(
+          "https://tiendabackend.azurewebsites.net/api/Productos/GetCategorias"
+        );
 
-    elimiarProducto(product) {
-      this.editedIndex = this.products.indexOf(product)
-      this.editedProduct = Object.assign({}, product)
-      this.dialogDelete = true
+        this.listaCategorias = response.data;
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+    async getProductos() {
+      try {
+        const response = await api.get(
+          "https://tiendabackend.azurewebsites.net/api/Productos/GetAllProducts"
+        );
+
+        this.listaProductos = response.data;
+        this.loading = false;
+      } catch (error) {
+        console.error("Error:", error);
+      }
     },
 
-    deleteItemConfirm() {
-      this.products.splice(this.editedIndex, 1)
-      this.closeDelete()
+    async crearProductos() {
+      try {
+        const data = this.defaultProduct;
+        const response = await api.post(
+          "https://tiendabackend.azurewebsites.net/api/Productos",
+          data
+        );
+
+        console.log(response);
+
+        this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
+      }
     },
 
-    editProduct(product) {
-      this.formTitle = 'Editar producto'
-      this.editedIndex = this.products.indexOf(product)
-      this.editedProduct = Object.assign({}, product)
-      this.dialog = true
+    //DESABILITAR PRODDUCTOS///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v///////////////////////////////////////////////////////////////////////////////////////////////////////
+    deshabilitarProducto(producto, index) {
+      console.log(producto + " - " + index);
+      this.deshabilitarDialog = true;
+    },
+    confirmDeshabilitar() {},
+    closeDeshabilitar() {
+      this.deshabilitarDialog = false;
     },
 
-    addProduct() {
-      this.formTitle = 'Agregar producto'
-      this.editedProduct = Object.assign({}, this.defaultProduct)
-      this.dialog = true
+    //EDITAR PRODDUCTOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    editarProducto(producto, index) {
+      this.formTitle = "Editar producto";
+      this.editedIndex = index;
+      this.editedProduct = Object.assign({}, producto);
+      // this.dialog = true;
+      this.productoDialog = true;
     },
-    saveProduct() {
-      if (this.formTitle === 'Agregar producto') {
-        this.products.push(this.editedProduct)
+    async actualizarProducto(producto) {
+      try {
+        console.log(producto);
+        const data = producto;
+        const response = await api.put(
+          "https://tiendabackend.azurewebsites.net/api/Productos?idProducto=" +
+            this.editedProduct.idProducto,
+          data
+        );
+
+        this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
+      }
+    },
+    closeEditar() {
+      this.productoDialog = false;
+    },
+
+    //AGREGAR PRODDUCTOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    agregarProducto() {
+      this.formTitle = "Agregar producto";
+      this.editedProduct = Object.assign({}, this.defaultProduct);
+      this.productoDialog = true;
+    },
+    async crearProducto(producto) {
+      try {
+        console.log(producto);
+        const data = producto;
+        const response = await api.post(
+          "https://tiendabackend.azurewebsites.net/api/Productos",
+          data
+        );
+
+        this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
+      }
+    },
+    guardarProductos(producto) {
+      // Verificar que el objeto de usuario tenga los datos necesarios
+      // if (
+      //   !producto.Nombre ||
+      //   !producto.Descripcion ||
+      //   !producto.CantidadStock ||
+      //   !producto.Precio ||
+      //   !producto.FotoUrl
+      //   /* ||
+      //   !producto.EstaActivo == true ||
+      //   !producto.EstaActivo == false */
+      // ) {
+      //   this.toast.error("Faltan datos del producto.", {
+      //     timeout: 3000,
+      //     closeOnClick: true,
+      //     pauseOnFocusLoss: false,
+      //     pauseOnHover: false,
+      //     draggable: true,
+      //     draggablePercent: 0.6,
+      //     showCloseButtonOnHover: true,
+      //     hideProgressBar: true,
+      //     closeButton: "button",
+      //     icon: true,
+      //     rtl: false,
+      //   });
+      //   return;
+      // }
+
+      if (this.formTitle === "Agregar producto") {
+        producto.Categorias.forEach((categoria) => {
+          categoria.PoseeCategoria = true;
+        });
+        this.crearProducto(producto);
+
+        console.log("Nuevo usuario agregado:", producto);
       } else {
-        const index = this.products.findIndex(
-          (product) => product.idCategory === this.editedProduct.idCategory
-        )
+        const index = this.listaProductos.findIndex(
+          (u) => u.idProducto === producto.idProducto
+        );
         if (index > -1) {
-          Object.assign(this.products[index], this.editedProduct)
+          console.log(producto);
+          Object.assign(this.listaProductos[index], producto);
+          producto.Categorias.forEach((categoria) => {
+            categoria.PoseeCategoria = true;
+          });
+
+          this.actualizarProducto(producto);
+
+          console.log("Usuario actualizado:", producto);
         }
       }
-      this.dialog = false
+      this.productoDialog = false;
     },
 
-    closeDialog() {
-      this.dialog = false
-    },
-
-    updateProduct(product) {
-      const index = this.products.findIndex(
-        (p) => p.idCategory === product.idCategory
-      )
-      if (index > -1) {
-        this.products[index].Stock = product.Stock
+    //FUNCIONES ADICIONALES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    getStock(cantidad) {
+      if (cantidad >= 50) {
+        return "success";
+      } else if (cantidad <= 20 && cantidad > 0) {
+        return "warning";
+      } else if (cantidad == 0) {
+        return "danger";
+      } else {
+        return "success";
       }
     },
 
-    closeDelete() {
-      this.dialogDelete = false
-      this.$nextTick(() => {
-        this.editedProduct = Object.assign({}, this.defaultProduct)
-        this.editedIndex = -1
-      })
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.products[this.editedIndex], this.editedProduct)
+    getStockLabel(cantidad) {
+      if (cantidad > 20) {
+        return "En Stock";
+      } else if (cantidad <= 20 && cantidad > 0) {
+        return "Pocas Unidades";
+      } else if (cantidad == 0) {
+        return "Sin Stock";
+      } else {
+        return "En Stock";
       }
-      else {
-        this.products.push(this.editedProduct)
-      }
-      this.dialog = false
     },
-
-    cancelar() {
-      this.dialog = false
-      this.$nextTick(() => {
-        this.editedProduct = Object.assign({}, this.defaultProduct)
-        this.editedIndex = -1
-      })
+    formatDate(value) {
+      value = new Date(value);
+      return value.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    },
+    formatCurrency(value) {
+      return value.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+    },
+    exportCSV() {
+      this.$refs.dt.exportCSV();
+    },
+    expandRow(row) {
+      this.expandedRows.push(row);
+    },
+    collapseRow(row) {
+      const index = this.expandedRows.findIndex((r) => r === row);
+      if (index !== -1) {
+        this.expandedRows.splice(index, 1);
+      }
     },
   },
-}
+  computed: {},
+
+  watch: {
+    validarToken() {
+      const token = localStorage.getItem("token");
+
+      this.$store.commit("mostrarTienda", token);
+      console.log(this.$store.state.estaLogueado);
+    },
+    dialogDelete(val) {
+      val || this.closeDelete();
+    },
+  },
+};
 </script>
+<style>
+@import "primeicons/primeicons.css";
+
+body {
+  background-color: #f3f3f3;
+}
+.mainContainer {
+  background-color: #f3f3f3;
+  height: 100%;
+}
+.rowContainer {
+  margin: 10px 0px;
+}
+.containerCols {
+  background-color: white;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 20px;
+}
+.content {
+  padding: 1%;
+}
+.pageTitle {
+  font-size: 150% !important;
+  margin: 10px 5px 15px 5px;
+}
+
+.pi {
+  font-family: PrimeIcons !important;
+}
+</style>

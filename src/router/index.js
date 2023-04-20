@@ -1,98 +1,87 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import PantallaProductos from '../views/cliente/PantallaProductos.vue'
-import CarritoCompras from '../views/cliente/CarritoCompras.vue'
-import PagarProducto from '../components/PagarProducto.vue'
-import GestionarStock from '../views/admin/GestionarStock.vue'
-import GestionarUsuarios from '../views/admin/GestionarUsuarios.vue'
-import GestionarRoles from '../views/admin/GestionarRoles.vue'
-import GestionarCategorias from '../views/admin/GestionarCategorias.vue'
-import MiPerfil from '../views/cliente/MiPerfil.vue'
-import MisPedidos from '../views/cliente/MisPedidos.vue'
-import PantallaLogin from '../views/PantallaLogin.vue'
+import { createRouter, createWebHashHistory } from "vue-router";
+import PantallaProductos from "../views/cliente/PantallaProductos.vue";
+import CarritoCompras from "../views/cliente/CarritoCompras.vue";
+import PagarProducto from "../components/PagarProducto.vue";
+import GestionarStock from "../views/admin/GestionarStock.vue";
+import GestionarUsuarios from "../views/admin/GestionarUsuarios.vue";
+import GestionarRoles from "../views/admin/GestionarRoles.vue";
+import MiPerfil from "../views/cliente/MiPerfil.vue";
+import MisPedidos from "../views/cliente/MisPedidos.vue";
+import PantallaLogin from "../views/PantallaLogin.vue";
 
 const routes = [
-
   {
-    path: '/pantallaLogin',
-    name: 'Login',
-    component: PantallaLogin
+    path: "/pantallaLogin",
+    name: "Login",
+    component: PantallaLogin,
   },
   {
-    path: '/',
-    name: 'Home',
-    component: PantallaProductos
+    path: "/",
+    name: "Home",
+    component: PantallaProductos,
   },
   {
-    path: '/carritoCompras',
-    name: 'Carrito',
+    path: "/carritoCompras",
+    name: "Carrito",
     component: CarritoCompras,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
-    path: '/pagarProducto',
-    name: 'Pagar',
+    path: "/pagarProducto",
+    name: "Pagar",
     component: PagarProducto,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
-    path: '/gestionarStock',
-    name: 'GestionarStock',
+    path: "/gestionarStock",
+    name: "GestionarStock",
     component: GestionarStock,
     meta: {
-      requiresAuth: true
-    }
-  }, 
+      requiresAuth: true,
+    },
+  },
   {
-    path: '/gestionarUsuarios',
-    name: 'GestionarUsuarios',
+    path: "/gestionarUsuarios",
+    name: "GestionarUsuarios",
     component: GestionarUsuarios,
     meta: {
-      requiresAuth: true
-    }
-  }, 
-  {
-    path: '/gestionarCategorias',
-    name: 'GestionarCategorias',
-    component: GestionarCategorias,
-    meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
-    path: '/gestionarRoles',
-    name: 'GestionarRoles',
+    path: "/gestionarRoles",
+    name: "GestionarRoles",
     component: GestionarRoles,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
-    path: '/MiPerfil',
-    name: 'MiPerfil',
+    path: "/MiPerfil",
+    name: "MiPerfil",
     component: MiPerfil,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
-    path: '/Pedidos',
-    name: 'MisPedidos',
+    path: "/Pedidos",
+    name: "MisPedidos",
     component: MisPedidos,
     meta: {
-      requiresAuth: true
-    }
-  }
-
-]
+      requiresAuth: true,
+    },
+  },
+];
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
-})
+  routes,
+});
 
 router.beforeEach((to, from, next) => {
   const isLoggedIn = localStorage.getItem("token");
@@ -110,5 +99,4 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-
-export default router
+export default router;
