@@ -3,27 +3,30 @@
         <v-col>
             <v-row>
                 <v-spacer></v-spacer>
-                <v-btn @click="addCategoria(nuevaCategoria)"><v-icon>mdi-account-plus</v-icon></v-btn>
             </v-row>
             <div class="mb-5"></div>
             <v-row>
-                <v-card style="width: 100%;">
+                <div class="d-flex justify-center">
+                <h1 class="ml-5 mb-15 mt-5" style="position: absolute; left: 50%; transform: translateX(-50%);">Gestión de Categorías</h1>
+                <v-btn style="margin-top: 125%; margin-left: 4315%;" @click="addCategoria(nuevaCategoria)"><v-icon>mdi-account-plus</v-icon></v-btn>
+                </div>
+               <v-card class="mx-auto" style="width: 75%; margin-top: 9%; margin-bottom: 5%;">
                     <v-table style="border-spacing: 0px;">
   <thead>
     <tr style="border-bottom: none;">
-  <th class="text-left" style="border-bottom: none; color: black; font: bold;" v-for="header in headers">
+  <th class="text-left" style="border-bottom: none; padding-left: 3.5%; color: black; font: bold;" v-for="header in headers">
     {{ header.text }}
   </th>
 </tr>
 
   </thead>
   <tbody>
-    <tr v-for="(categoria, index) in listaCategorias" v-bind:key="index" v-bind:categoria="categoria">
-      <td style="padding-left: 15px; ">{{ categoria.idCategoria }}</td>
-      <td style="padding-left: 1%; ">{{ categoria.Nombre }}</td>
-      <td style="padding-left: 15px; ">{{ categoria.Descripcion }}</td>
-      <td ><v-icon style="padding-left: 100%;" @click="editCategoria(categoria)" color="#0083B8">mdi-pencil</v-icon></td>
-      <td ><v-icon style="margin-left: 7%; ;" @click="deleteCategoria(categoria)" color="#B50000">mdi-delete</v-icon></td>
+    <tr style="border-bottom: none;" v-for="(categoria, index) in listaCategorias" v-bind:key="index" v-bind:categoria="categoria">
+      <td style="padding-left: 4%;border-bottom: none; ">{{ categoria.idCategoria }}</td>
+      <td style="padding-left: 3.5%; border-bottom: none; ">{{ categoria.Nombre }}</td>
+      <td style="padding-left: 3.5%; border-bottom: none; ">{{ categoria.Descripcion }}</td>
+      <td style="border-bottom: none; "><v-icon style="padding-left: 100%" @click="editCategoria(categoria)" color="#0083B8">mdi-pencil</v-icon></td>
+      <td style="border-bottom: none; "><v-icon style="margin-left: 7%" @click="deleteCategoria(categoria)" color="#B50000">mdi-delete</v-icon></td>
     </tr>
   </tbody>
 </v-table>
