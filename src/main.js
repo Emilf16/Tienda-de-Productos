@@ -1,20 +1,19 @@
-
-import App from './App.vue'
-import router from './router'
-import vuetify from './plugins/vuetify'
-import { loadFonts } from './plugins/webfontloader'
-import PrimeVue from 'primevue/config';
-import { createApp } from 'vue'
-import { createStore } from 'vuex'
+import App from "./App.vue";
+import router from "./router";
+import vuetify from "./plugins/vuetify";
+import { loadFonts } from "./plugins/webfontloader";
+import PrimeVue from "primevue/config";
+import { createApp } from "vue";
+import { createStore } from "vuex";
 import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import { FilterMatchMode } from 'primevue/api';
-import "vue-easytable/libs/theme-default/index.css"; // import style
-import VueCreditCardValidation from 'vue-credit-card-validation';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { FilterMatchMode } from "primevue/api";
+// import "vue-easytable/libs/theme-default/index.css"; // import style
+import VueCreditCardValidation from "vue-credit-card-validation";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-loadFonts()
+loadFonts();
 
 const store = createStore({
   state() {
@@ -33,25 +32,23 @@ const store = createStore({
         hideProgressBar: true,
         closeButton: "button",
         icon: true,
-        rtl: false
+        rtl: false,
       },
-    }
+    };
   },
   mutations: {
-
     agregarNuevoProducto(state, producto) {
-      state.productosCarrito.push(producto)
+      state.productosCarrito.push(producto);
     },
     mostrarTienda(state, token) {
       if (token == null) {
         state.estaLogueado = false;
-      }
-      else {
+      } else {
         state.estaLogueado = true;
       }
-    }
-  }
-})
+    },
+  },
+});
 
 createApp(App)
   .use(router)
@@ -64,7 +61,7 @@ createApp(App)
   .use(Toast, {
     transition: "Vue-Toastification__fade",
     maxToasts: 20,
-    newestOnTop: true
+    newestOnTop: true,
   })
-  .component('font-awesome-icon', FontAwesomeIcon)
-  .mount('#app')
+  .component("font-awesome-icon", FontAwesomeIcon)
+  .mount("#app");
