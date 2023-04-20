@@ -8,24 +8,25 @@
             <div class="mb-5"></div>
             <v-row>
                 <v-card style="width: 100%;">
-                    <v-table fixed-header height="auto">
-                        <thead>
-                            <tr>
-                                <th class="text-left" v-for="header in headers">
-                                    {{ header.text }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(categoria, index)  in listaCategorias" v-bind:key="index" v-bind:categoria="categoria">
-                                <td>{{ categoria.idCategoria }}</td>
-                                <td>{{ categoria.Nombre }}</td>
-                                <td>{{ categoria.Descripcion }}</td>
-                                <v-icon style="margin-top: 7%;" @click="editCategoria(categoria)" color="#0083B8">mdi-pencil</v-icon>
-                                <v-icon style="margin-top: 7%; margin-left: 7%;" @click="deleteCategoria(categoria)" color="#B50000">mdi-delete</v-icon>
-                            </tr>
-                        </tbody>
-                    </v-table>
+                    <v-table style="border-spacing: 0px;">
+  <thead>
+    <tr style="border-bottom: none;">
+  <th class="text-left" style="border-bottom: none; color: black; font: bold;" v-for="header in headers">
+    {{ header.text }}
+  </th>
+</tr>
+
+  </thead>
+  <tbody>
+    <tr v-for="(categoria, index) in listaCategorias" v-bind:key="index" v-bind:categoria="categoria">
+      <td style="padding-left: 15px; ">{{ categoria.idCategoria }}</td>
+      <td style="padding-left: 1%; ">{{ categoria.Nombre }}</td>
+      <td style="padding-left: 15px; ">{{ categoria.Descripcion }}</td>
+      <td ><v-icon style="padding-left: 100%;" @click="editCategoria(categoria)" color="#0083B8">mdi-pencil</v-icon></td>
+      <td ><v-icon style="margin-left: 7%; ;" @click="deleteCategoria(categoria)" color="#B50000">mdi-delete</v-icon></td>
+    </tr>
+  </tbody>
+</v-table>
                 </v-card>
             </v-row>
         </v-col>
