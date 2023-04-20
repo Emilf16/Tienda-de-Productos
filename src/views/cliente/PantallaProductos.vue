@@ -89,10 +89,11 @@
         xs="12"
       >
         <v-card class="mx-auto my-2" max-width="auto" elevation="6">
+          <div class="my-4"></div>
           <v-img
-            v-if="producto.Imagen != null"
-            :src="producto.Imagen"
-            :alt="producto.Nombre"
+            v-if="producto.FotoUrl != null"
+            :src="producto.FotoUrl"
+            :alt="producto.FotoUrl"
             height="200px"
             contain
           ></v-img>
@@ -147,7 +148,7 @@
             variant="filled"
             auto-grow
             label="Descripción"
-            rows="6"
+            rows="4"
             row-height="30"
             shaped
           ></v-textarea>
@@ -315,6 +316,7 @@ export default {
     },
 
     async agregarAlCarrito(produto) {
+      console.log(produto);
       try {
         const response = await api.post(
           `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${produto.idProducto}&cantidad=1&precioPorProducto=0`
