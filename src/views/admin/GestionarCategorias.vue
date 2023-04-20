@@ -14,14 +14,13 @@
             Gestión de Categorías
           </h1>
           <v-btn
-            style="margin-top: 125%; margin-left: 3930%"
+            style="margin-top: 125%; margin-left: 4530%"
             @click="addCategoria(nuevaCategoria)"
             ><v-icon>mdi-account-plus</v-icon></v-btn
           >
         </div>
         <v-card
-          class="mx-auto"
-          style="width: 60%; margin-top: 9%; margin-bottom: 5%"
+          style="width: 90%; margin-top: 9%; margin-bottom: 10%"
         >
           <v-table style="border-spacing: 0px">
             <thead>
@@ -47,7 +46,7 @@
                 v-bind:key="index"
                 v-bind:categoria="categoria"
               >
-                <td style="padding-left: 4%; border-bottom: none">
+                <td style="padding-left: 4%; margin-bottom: 2%; border-bottom: none">
                   {{ categoria.idCategoria }}
                 </td>
                 <td style="padding-left: 3.5%; border-bottom: none">
