@@ -89,29 +89,29 @@
                                 <Column styleClass="col-icon" :expander="true" style="width: 5rem">
                                     <template #body="{ data }">
                                         <Button icon="pi pi-eye" text rounded aria-label="Bookmark" @click="showDetails(data.idPedido)"/>
-                                        <Dialog v-model:visible="detailsVisible" header="Detalles del pedido" :style="{ width: '75vw' }" maximizable modal :contentStyle="{ height: '300px' }">
-                                            <DataTable :value="actualDetails.Carrito.Productos">
-                                                <Column field="idProducto" header="ID del Producto" sortable></Column>
-                                                <Column field="Nombre" header="Nombre del Producto" sortable></Column>
-                                                <Column field="Descripcion" header="Descripción del Producto" sortable></Column>
-                                                <Column field="CantidadEnCarrito" header="Cantidad" sortable></Column>
-                                                <Column field="Precio" header="Precio" sortable>
-                                                    <template #body="{ data }">
-                                                        {{formatCurrency(data.Precio)}}
-                                                    </template>
-                                                </Column>
-                                                <Column field="Valoracion" header="Valoración" sortable>
-                                                    <template #body="slotProps" >
-                                                        <Rating :modelValue="slotProps.data.Valoracion" readonly :cancel="false" />
-                                                    </template>
-                                                </Column>
-                                            </DataTable>
-                                            <template #footer>
-                                                <Button label="Ok" icon="pi pi-check" @click="detailsVisible = false" />
-                                            </template>
-                                        </Dialog>
                                     </template>
                                 </Column>
+                                <Dialog v-model:visible="detailsVisible" header="Detalles del pedido" :style="{ width: '75vw' }" maximizable modal :contentStyle="{ height: '300px' }">
+                                    <DataTable :value="actualDetails.Carrito.Productos">
+                                        <Column field="idProducto" header="ID del Producto" sortable></Column>
+                                        <Column field="Nombre" header="Nombre del Producto" sortable></Column>
+                                        <Column field="Descripcion" header="Descripción del Producto" sortable></Column>
+                                        <Column field="CantidadEnCarrito" header="Cantidad" sortable></Column>
+                                        <Column field="Precio" header="Precio" sortable>
+                                            <template #body="{ data }">
+                                                {{formatCurrency(data.Precio)}}
+                                            </template>
+                                        </Column>
+                                        <Column field="Valoracion" header="Valoración" sortable>
+                                            <template #body="slotProps" >
+                                                <Rating :modelValue="slotProps.data.Valoracion" readonly :cancel="false" />
+                                            </template>
+                                        </Column>
+                                    </DataTable>
+                                    <template #footer>
+                                        <Button label="Ok" icon="pi pi-check" @click="detailsVisible = false" />
+                                    </template>
+                                </Dialog>
                             </DataTable>
                         </div>
                     </div>  

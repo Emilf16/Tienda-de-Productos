@@ -42,7 +42,8 @@
                     <div class="content">
                         <h1 class="pageTitle">Perfiles y Roles</h1>
                         <div>
-                            <DataTable ref="dt" v-model:expandedRows="expandedRows"  v-model:filters="filters" :value="perfiles" showGridlines resizableColumns columnResizeMode="fit" removableSort tableStyle="min-width: 50rem" paginator :rows="10" dataKey="id" :loading="loading">
+                            <DataTable ref="dt"  v-model:filters="filters" :value="perfiles" resizableColumns columnResizeMode="fit" removableSort tableStyle="min-width: 50rem" paginator :rows="10" dataKey="id" :loading="loading">
+                                <template #empty> No se han encontrado perfiles. </template>
                                 <template #header>
                                     <div class="flex justify-content-between">
                                         <Button icon="pi pi-external-link" label="Exportar" severity="warning" @click="exportCSV($event)" >
@@ -61,13 +62,13 @@
                                 </template>
                                 <Column field="idPerfil" header="# de Perfil" sortable ></Column>
                                 <Column field="Nombre" header="Nombre" sortable />
-                                <Column field="Descripcion" header="Descripcion" sortable />
-                                <Column field="CantPermisos" header="Cant. Permisos" sortable style="width: 6rem">
+                                <Column field="Descripcion" header="Descripcion" sortable style="width: 70%"/>
+                                <Column field="CantPermisos" header="Cant. Permisos" sortable class="text-center">
                                     <template #body="{ data }" >
                                         <Badge  :value="data.CantPermisos" severity="warning" />
                                     </template>
                                 </Column>
-                                <Column field="PorDefecto" header="Por Defecto" sortable >
+                                <Column field="PorDefecto" header="Por Defecto" sortable class="text-center">
                                     <template #body="{ data }">
                                         <i className="pi pi-check" v-if="data.PorDefecto" />
                                     </template>
@@ -81,32 +82,85 @@
                                             location="top"
                                             >Editar perfil</v-tooltip>
                                         </Button>
-                                        <Dialog v-model:visible="detailsVisible" header="Editar perfil" :style="{ width: '75vw' }" maximizable modal :contentStyle="{ height: '300px' }">
-                                            <template #body>
-                                                <PickList v-model="products" listStyle="height:342px" dataKey="id">
-                                                    <template #sourceheader> Available </template>
-                                                    <template #targetheader> Selected </template>
-                                                    <template #item="slotProps">
-                                                        <div class="flex flex-wrap p-2 align-items-center gap-3">
-                                                            <img class="w-4rem shadow-2 flex-shrink-0 border-round" :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.item.image" :alt="slotProps.item.name" />
-                                                            <div class="flex-1 flex flex-column gap-2">
-                                                                <span class="font-bold">{{ slotProps.item.name }}</span>
-                                                                <div class="flex align-items-center gap-2">
-                                                                    <i class="pi pi-tag text-sm"></i>
-                                                                    <span>{{ slotProps.item.category }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <span class="font-bold text-900">$ {{ slotProps.item.price }}</span>
-                                                        </div>
-                                                    </template>
-                                                </PickList>
-                                            </template>
-                                            <template #footer>
-                                                <Button label="Guardar" icon="pi pi-check" @click="detailsVisible = false" />
-                                            </template>
-                                        </Dialog>
+                                        
                                     </template>
                                 </Column>
+                                <Dialog v-model:visible="perfilDetailsVisible" header="Editar perfil" :style="{ width: '60vw' }" maximizable modal>
+                                    <div class="dialogContent">
+                                        <v-form ref="form">
+                                            <div class="flex flex-column gap-2 p-2">
+                                                <label for="nombre">Nombre del perfil:</label>
+                                                <InputText id="nombre" v-model="actualDetails.Nombre" aria-describedby="username-help" />
+                                            </div>
+                                            <div class="flex flex-column gap-2 p-2">
+                                                <label for="descripcion">Descripción del perfil:</label>
+                                                <Textarea id="nombre" v-model="actualDetails.Descripcion" autoResize rows="5" />
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <div class="d-flex flex-column gap-2 p-2">
+                                                    <label for="PorDefecto">Perfil por defecto:</label>
+                                                    <InputSwitch id="PorDefecto" v-model="actualDetails.PorDefecto" />
+                                                </div>
+                                                <div class="flex flex-column gap-2 p-2">
+                                                    <label for="EstaActivo">Activo:</label>
+                                                    <InputSwitch id="EstaActivo" v-model="actualDetails.EstaActivo" />
+                                                </div>
+                                            </div>
+                                            
+                                        </v-form>
+                                        <PickList v-model="products" listStyle="height:342px" dataKey="id">
+                                            <template #sourceheader> Available </template>
+                                            <template #targetheader> Selected </template>
+                                            <template #item="slotProps">
+                                                <div class="flex flex-wrap p-2 align-items-center gap-3">
+                                                    <img class="w-4rem shadow-2 flex-shrink-0 border-round" :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.item.image" :alt="slotProps.item.name" />
+                                                    <div class="flex-1 flex flex-column gap-2">
+                                                        <span class="font-bold">{{ slotProps.item.name }}</span>
+                                                        <div class="flex align-items-center gap-2">
+                                                            <i class="pi pi-tag text-sm"></i>
+                                                            <span>{{ slotProps.item.category }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="font-bold text-900">$ {{ slotProps.item.price }}</span>
+                                                </div>
+                                            </template>
+                                        </PickList>
+                                        <PickList   
+                                            :source="vistasDisponibles"
+                                            :target="vistasAsignadas"
+                                            :show-source-filter="true"
+                                            :show-target-filter="true"
+                                            :source-filter-placeholder="'Filtrar disponibles'"
+                                            :target-filter-placeholder="'Filtrar asignados'"
+                                            :source-header="'Disponibles'"
+                                            :target-header="'Asignados'"
+                                            :item-value="'idVista'"
+                                            :item-label="'Nombre'"
+                                            @target-select="eliminarDisponiblesSeleccionados"
+                                            @source-select="eliminarAsignadosSeleccionados"
+                                            listStyle="height:342px">
+                                            <template #sourceheader> Disponibles </template>
+                                            <template #targetheader> Asignados </template>
+                                            <!-- <template #item="slotProps">
+                                                <div class="flex flex-wrap p-2 align-items-center gap-3">
+                                                    <div class="flex-1 flex flex-column gap-2">
+                                                        <span class="font-bold">{{ slotProps }}</span>
+                                                        <div class="flex align-items-center gap-2">
+                                                            <i class="pi pi-tag text-sm"></i>
+                                                            <span>{{ slotProps }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="font-bold text-900">$ {{ slotProps.item.price }}</span>
+                                                </div>
+                                            </template> -->
+                                        </PickList>
+                                    </div>
+                                    
+                                    
+                                    <template #footer>
+                                        <Button label="Guardar" icon="pi pi-save" @click="detailsVisible = false" />
+                                    </template>
+                                </Dialog>
                             </DataTable>
                         </div>
                     </div>  
@@ -128,6 +182,8 @@
     import Button from 'primevue/button'
     import Dialog from 'primevue/dialog'
     import PickList from 'primevue/picklist'
+    import InputSwitch from 'primevue/inputswitch'
+    import Textarea from 'primevue/textarea'
     import 'primeicons/primeicons.css';
 
     export default {
@@ -144,7 +200,9 @@
             Badge,
             Button,
             Dialog,
-            PickList
+            PickList,
+            InputSwitch,
+            Textarea
         },
 
         data() {
@@ -175,23 +233,100 @@
                 ],
                 pageLoaded: false,
                 token: localStorage.getItem('token'),
-                actualDetails: {
-                    idPedido: 0,
-                    Carrito: {
-                        Productos: []
-                    }
-                },
-                detailsVisible: false,
+                actualDetails: {},
+                perfilDetailsVisible: false,
                 vistas: [],
+                perfiles: [],
+                vistasDisponibles: [],
+                vistasAsignadas: [],
+                vistasSeleccionadas: [],
+                sourceCars: ['Audi', 'BMW', 'Fiat', 'Ford', 'Honda', 'Jaguar', 'Mercedes', 'Renault', 'VW'],
+                targetCars: [],
+                productos: [
+                {
+                    id: '1000',
+                    code: 'f230fh0g3',
+                    name: 'Bamboo Watch',
+                    description: 'Product Description',
+                    image: 'bamboo-watch.jpg',
+                    price: 65,
+                    category: 'Accessories',
+                    quantity: 24,
+                    inventoryStatus: 'INSTOCK',
+                    rating: 5
+                },
+                {
+                    id: '1001',
+                    code: 'nvklal433',
+                    name: 'Black Watch',
+                    description: 'Product Description',
+                    image: 'black-watch.jpg',
+                    price: 72,
+                    category: 'Accessories',
+                    quantity: 61,
+                    inventoryStatus: 'INSTOCK',
+                    rating: 4
+                },
+                {
+                    id: '1002',
+                    code: 'zz21cz3c1',
+                    name: 'Blue Band',
+                    description: 'Product Description',
+                    image: 'blue-band.jpg',
+                    price: 79,
+                    category: 'Fitness',
+                    quantity: 2,
+                    inventoryStatus: 'LOWSTOCK',
+                    rating: 3
+                },
+                {
+                    id: '1003',
+                    code: '244wgerg2',
+                    name: 'Blue T-Shirt',
+                    description: 'Product Description',
+                    image: 'blue-t-shirt.jpg',
+                    price: 29,
+                    category: 'Clothing',
+                    quantity: 25,
+                    inventoryStatus: 'INSTOCK',
+                    rating: 5
+                },
+                {
+                    id: '1004',
+                    code: 'h456wer53',
+                    name: 'Bracelet',
+                    description: 'Product Description',
+                    image: 'bracelet.jpg',
+                    price: 15,
+                    category: 'Accessories',
+                    quantity: 73,
+                    inventoryStatus: 'INSTOCK',
+                    rating: 4
+                },
+                {
+                    id: '1005',
+                    code: 'av2231fwg',
+                    name: 'Brown Purse',
+                    description: 'Product Description',
+                    image: 'brown-purse.jpg',
+                    price: 120,
+                    category: 'Accessories',
+                    quantity: 0,
+                    inventoryStatus: 'OUTOFSTOCK',
+                    rating: 4
+                }]
             }
         },
         mounted() {
+            this.loading = true;
             if (!this.pageLoaded) {
                 api.get('Account')
                     .then(data => {
                         this.user = data.data.usuario;
                         this.cargarPerfiles();
+                        this.cargarVistas();
                         this.pageLoaded = true;
+                        this.loading = false;
                     })
                     .catch(error => {
                         this.toast.error("Error 500. " + error, this.toastProperties);
@@ -201,26 +336,59 @@
         methods: {
             async cargarPerfiles() {
                 try {
-                    this.loading = true;
-
                     const response = await api.get("Perfiles");
                     
                     this.perfiles = response.data;
-                    this.loading = false;
-                    console.log(this.perfiles);
                 } 
                 catch (error) {
                     this.toast.error("Error 500. Error al cargar los perfiles.", this.toastProperties);
                 }
             },
+            async cargarVistas() {
+                try {
+                    const response = await api.get("Perfiles/GetVistas");
+                    
+                    this.vistas = response.data;
+                    console.log(this.vistas);
+                } 
+                catch (error) {
+                    this.toast.error("Error 500. Error al cargar las vistas.", this.toastProperties);
+                }
+            },
             exportCSV() {
                 this.$refs.dt.exportCSV();
             },
-            showDetails(idPerfil){
+            showDetails(idPerfil) {
                 const model = this.perfiles.find(item => item.idPerfil === idPerfil);
                 this.actualDetails = model;
-                this.detailsVisible = true;
+                console.log(model);
+
+                if (model.Vistas != null) {
+                    console.log(model.Vistas);
+                    this.vistasDisponibles = model.Vistas.filter(vista => !vista.Permiso);
+                    this.vistasAsignadas = model.Vistas.filter(vista => vista.Permiso);
+                    this.vistasSeleccionadas = this.vistasAsignadas;
+                    console.log(this.vistasDisponibles, this.vistasAsignadas);
+                }
+                else{
+                    this.vistasDisponibles = this.vistas;
+                    this.vistasAsignadas = [];
+                }
+
+                this.actualDetails = model;
+                this.perfilDetailsVisible = true;
             },
+            eliminarDisponiblesSeleccionados() {
+                this.vistasDisponibles = this.vistasDisponibles.filter(
+                    vista => !this.vistasSeleccionadas.includes(vista)
+                );
+            },
+            eliminarAsignadosSeleccionados() {
+            // eliminar las vistas seleccionadas de la lista de asignados
+                this.vistasAsignadas = this.vistasAsignadas.filter(
+                    vista => !this.vistasSeleccionadas.includes(vista)
+                );
+            }
         }
     }
 </script>
