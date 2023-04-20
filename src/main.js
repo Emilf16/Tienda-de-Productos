@@ -9,7 +9,7 @@ import { jsPDF } from "jspdf";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { FilterMatchMode } from "primevue/api";
-// import "vue-easytable/libs/theme-default/index.css"; // import style
+import "vue-easytable/libs/theme-default/index.css"; // import style
 import VueCreditCardValidation from "vue-credit-card-validation";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
