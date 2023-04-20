@@ -74,7 +74,13 @@
                                         </Dropdown>
                                     </template>
                                     <template #body="{ data }">
-                                        <Tag :value="data.Estado" :icon="getIcon(data.Estado)" :severity="getSeverity(data.Estado)" />
+                                        <Tag :value="data.Estado" :icon="getIcon(data.Estado)" :severity="getSeverity(data.Estado)" style="cursor: pointer">
+                                            <span class="p-tag-value">{{ data.Estado }}</span>
+                                            <v-tooltip
+                                                activator="parent"
+                                                location="top"
+                                                >Cambiar estado</v-tooltip>
+                                        </Tag>
                                     </template>
                                 </Column>
                                 <Column field="MontoPagado" header="Monto total" sortable>
@@ -111,15 +117,6 @@
                                     </template>
                                 </Column>
                                 <Dialog v-model:visible="detailsVisible" header="Detalles del pedido" :style="{ width: '75vw' }" maximizable modal :contentStyle="{ height: '300px' }">
-                                    <template #header>
-                                        <span id="pv_id_5_header" class="p-dialog-title">Detalles del pedido</span>
-                                        <Dropdown :options="statuses" optionLabel="label">
-                                            <template #option="{ option }">
-                                                <Tag :value="option.Nombre" :icon="getIcon(option.Nombre)" :severity="getSeverity(option.Nombre)" />
-                                            </template>
-                                        </Dropdown>
-
-                                    </template>
                                     <DataTable :value="actualDetails.Carrito.Productos">
                                         <Column field="idProducto" header="ID del Producto" sortable></Column>
                                         <Column field="Nombre" header="Nombre del Producto" sortable></Column>
