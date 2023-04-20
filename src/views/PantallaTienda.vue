@@ -75,6 +75,15 @@
           ></v-list-item
         ></router-link>
         <router-link
+          to="/gestionarCategorias"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+            prepend-icon="mdi-view-dashboard"
+            title="categ"
+            value="categ"
+          ></v-list-item
+        ></router-link>
+        <router-link
           v-for="(vista, index) in vistas"
           :key="index"
           :to="vista.URL"
