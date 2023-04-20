@@ -22,7 +22,7 @@
                                 <td>{{ categoria.Nombre }}</td>
                                 <td>{{ categoria.Descripcion }}</td>
                                 <v-icon style="margin-top: 7%;" @click="editCategoria(categoria)" color="#0083B8">mdi-pencil</v-icon>
-                                <v-icon style="margin-top: 7%; margin-left: 7%;" @click="deleteCategoria(idCategoria)" color="#B50000">mdi-delete</v-icon>
+                                <v-icon style="margin-top: 7%; margin-left: 7%;" @click="deleteCategoria(categoria)" color="#B50000">mdi-delete</v-icon>
                             </tr>
                         </tbody>
                     </v-table>
@@ -64,6 +64,26 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialogDelete" max-width="600px">
+      <v-card>
+        <v-card-title class="text-h5" style="text-align:center">¿Está seguro que desea eliminar esta categoría?</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="#BE1D1D" variant="flat" @click="closeDelete">
+            <span style="color:white">
+              Cancelar
+            </span>
+          </v-btn>
+          <v-btn color="#008F39" variant="flat" @click="deletedCategoria(editedCategoria.idCategoria)">
+            <span style="color:white">
+              Confirmar
+            </span>
+          </v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+
+      </v-card>
+    </v-dialog>
     </v-container>
 </template>
   
@@ -75,6 +95,7 @@ import api from "@/utilities/api";
 export default {
     data: () => ({
         dialog: false,
+        dialogDelete: false,
         listaCategorias: [],
         categoriaSeleccionada: {
             idCategoria: '',
@@ -288,18 +309,24 @@ export default {
             this.editedIndex = this.listaCategorias.indexOf(categoria)
             this.editedCategoria = Object.assign({}, categoria)
         },
-        async deleteCategoria(idCategoria) {
+        deleteCategoria(categoria) 
+        {
+            this.categoriaSeleccionada = this.listaCategorias.indexOf(categoria)
+            this.editedCategoria = Object.assign({}, categoria)
+            this.dialogDelete = true
+            this.formTitle = 'Eliminar Categoría'
+        },
+        async deletedCategoria(idCategoria) {
+            console.log(idCategoria);
+            console.log(`https://tiendabackend.azurewebsites.net/api/Categorias?idCategoria=${idCategoria}`)
             try {
                 const url = `https://tiendabackend.azurewebsites.net/api/Categorias?idCategoria=${idCategoria}`;
+                
                 const token = localStorage.getItem('token');
-
-                const response = api.delete(url, idCategoria, {
-                    headers: {
-                        Authorization: `${token}`
-                    }
-                });
+                
+                const response = await api.delete(url);
+                
                 if (response.data.Success) {
-
                     this.toast.success(response.data.Message, {
                         timeout: 3000,
                         closeOnClick: true,
@@ -355,6 +382,10 @@ export default {
         closeDialog() 
         {
             this.dialog = false
+        },
+        closeDelete() 
+        {
+            this.dialogDelete = false
         },
     },
     mounted() {
