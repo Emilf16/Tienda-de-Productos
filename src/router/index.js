@@ -37,7 +37,7 @@ const routes = [
     },
   },
   {
-    path: "/gestionarStock",
+    path: "/gestionarProductos",
     name: "GestionarStock",
     component: GestionarStock,
     meta: {
@@ -53,8 +53,8 @@ const routes = [
     },
   },
   {
-    path: "/gestionarRoles",
-    name: "GestionarRoles",
+    path: "/gestionarPerfiles",
+    name: "GestionarPerfiles",
     component: GestionarRoles,
     meta: {
       requiresAuth: true,

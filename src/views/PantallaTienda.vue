@@ -67,7 +67,6 @@
 
       <v-divider></v-divider>
       <v-list density="compact" nav>
-        <!-- buscar productos -->
         <router-link to="/" style="text-decoration: none; color: inherit"
           ><v-list-item
             prepend-icon="mdi-view-dashboard"
@@ -75,68 +74,15 @@
             value="productos"
           ></v-list-item
         ></router-link>
-
-        <!-- ver carrito -->
         <router-link
-          to="/carritoCompras"
+          v-for="(vista, index) in vistas"
+          :key="index"
+          :to="vista.URL"
           style="text-decoration: none; color: inherit"
           ><v-list-item
-            prepend-icon="mdi-cart-outline"
-            title="Carrito"
-            value="carrito"
-          ></v-list-item
-        ></router-link>
-
-        <!-- Categorias -->
-        <router-link
-          to="/pantallaCategorias"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-shopping"
-            title="Categorias"
-            value="categoria"
-          ></v-list-item
-        ></router-link>
-
-        <!-- gestionar productos -->
-        <router-link
-          to="/gestionarStock"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-cart-arrow-down"
-            title="Gestionar Stock"
-            value="stock"
-          ></v-list-item
-        ></router-link>
-
-        <!-- gestionar Usuario -->
-        <router-link
-          to="/gestionarUsuarios"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-account-edit"
-            title="Gestionar Usuarios"
-            value="usuarios"
-          ></v-list-item
-        ></router-link>
-        <!-- gestionar Roles -->
-        <router-link
-          to="/gestionarRoles"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-account-key"
-            title="Gestionar Roles"
-            value="roles"
-          ></v-list-item
-        ></router-link>
-        <!-- gestionar Categorias -->
-        <router-link
-          to="/gestionarCategorias"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-store"
-            title="Gestionar Categorias"
-            value="categoria"
+            prepend-icon="mdi-view-dashboard"
+            :title="vista.Vista"
+            :value="vista.DescVista"
           ></v-list-item
         ></router-link>
       </v-list>
@@ -200,8 +146,9 @@ export default {
     return {
       drawer: false,
       rail: true,
+      user: {},
       reveal: false,
-      categories: [],
+      vistas: [],
       socialIcons: [
         { icon: "mdi-facebook", link: "www.facebook.com/mitienda" },
         { icon: "mdi-twitter", link: "www.twitter.com/mitienda" },
@@ -233,7 +180,7 @@ export default {
         console.error("Error:", error);
       }
     },
-    async get() {
+    async getUsuario() {
       try {
         const url = "https://tiendabackend.azurewebsites.net/api/Account";
         const token = localStorage.getItem("token");
@@ -243,12 +190,17 @@ export default {
             Authorization: `${token}`,
           },
         });
+        this.user = response.data;
+        this.vistas = response.data.vistas;
 
         console.log("Success:", response.data);
       } catch (error) {
         console.error("Error:", error);
       }
     },
+  },
+  mounted() {
+    this.getUsuario();
   },
 };
 </script>
