@@ -108,20 +108,11 @@
                   </Column>
 
                   <!-- ESTADO ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-                  <Column header="STOCK" sortable style="min-width: 12rem">
+                  <Column header="Estado" sortable style="min-width: 12rem">
                     <template #body="{ data }">
                       <Tag
                         :value="getStockLabel(data.CantidadStock)"
                         :severity="getStock(data.CantidadStock)"
-                      />
-                    </template>
-                  </Column>
-                  <!-- DISPONIBILIDAD ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-                  <Column header="ESTATUS" sortable style="min-width: 12rem">
-                    <template #body="{ data }">
-                      <Tag
-                        :value="getEstatusLabel(data.EstaActivo)"
-                        :severity="getEstatus(data.EstaActivo)"
                       />
                     </template>
                   </Column>
@@ -142,10 +133,10 @@
                         @click="editarProducto(data, index)"
                       />
                       <Button
-                        :icon="getIcono(data.EstaActivo)"
-                        text
+                        icon="pi pi-trash"
+                        outlined
                         rounded
-                        :severity="getIconoEstatus(data.EstaActivo)"
+                        severity="danger"
                         @click="deshabilitarProducto(data, index)"
                       />
                     </template>
@@ -161,7 +152,7 @@
     <!-- DIALOGO PARA EDITAR PRODUCTOS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
     <Dialog
       v-model:visible="productoDialog"
-      :style="{ width: '40%' }"
+      :style="{ width: '100vh' }"
       :modal="true"
       class="p-fluid"
       :header="formTitle"
@@ -219,27 +210,90 @@
         />
       </div>
 
-      <div class="formgrid grid">
-        <div class="field col">
-          <label for="quantity">Disponibilidad</label>
-          <v-col>
-            <InputSwitch v-model="editedProduct.EstaActivo" />
-          </v-col>
-        </div>
-        <div class="field col">
-          <label for="quantity">Categorias</label>
-          <MultiSelect
-            v-model="editedProduct.Categorias"
-            :options="listaCategorias"
-            filter
-            optionLabel="Nombre"
-            placeholder="Categorias"
-            :maxSelectedLabels="3"
-            class="w-full md:w-20rem"
-            display="chip"
-          />
-        </div>
+      <div class="field">
+        <MultiSelect
+          v-model="editedProduct.Categorias"
+          :options="listaCategorias"
+          filter
+          optionLabel="Nombre"
+          placeholder="Categorias"
+          :maxSelectedLabels="3"
+          class="w-full md:w-20rem"
+          display="chip"
+        />
       </div>
+
+      <!-- <div class="field">
+        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
+        <Dropdown
+          id="inventoryStatus"
+          v-model="product.inventoryStatus"
+          :options="statuses"
+          optionLabel="label"
+          placeholder="Select a Status"
+        >
+          <template #value="slotProps">
+            <div v-if="slotProps.value && slotProps.value.value">
+              <Tag
+                :value="slotProps.value.value"
+                :severity="getStatusLabel(slotProps.value.label)"
+              />
+            </div>
+            <div v-else-if="slotProps.value && !slotProps.value.value">
+              <Tag
+                :value="slotProps.value"
+                :severity="getStatusLabel(slotProps.value)"
+              />
+            </div>
+            <span v-else>
+              {{ slotProps.placeholder }}
+            </span>
+          </template>
+        </Dropdown>
+      </div> -->
+
+      <!-- <div class="field">
+        <label class="mb-3">Category</label>
+        <div class="formgrid grid">
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category1"
+              name="category"
+              value="Accessories"
+              v-model="product.category"
+            />
+            <label for="category1">Accessories</label>
+          </div>
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category2"
+              name="category"
+              value="Clothing"
+              v-model="product.category"
+            />
+            <label for="category2">Clothing</label>
+          </div>
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category3"
+              name="category"
+              value="Electronics"
+              v-model="product.category"
+            />
+            <label for="category3">Electronics</label>
+          </div>
+          <div class="field-radiobutton col-6">
+            <RadioButton
+              id="category4"
+              name="category"
+              value="Fitness"
+              v-model="product.category"
+            />
+            <label for="category4">Fitness</label>
+          </div>
+        </div>
+      </div> -->
+
       <div class="formgrid grid">
         <div class="field col">
           <label for="price">Precio</label>
@@ -303,9 +357,6 @@
 </template>
 
 <script>
-import SelectButton from "primevue/selectbutton";
-
-import ToggleButton from "primevue/togglebutton";
 import Chip from "primevue/chip";
 import { useToast } from "vue-toastification";
 import api from "../../utilities/api";
@@ -323,7 +374,7 @@ import InputNumber from "primevue/inputnumber";
 import "primeicons/primeicons.css";
 import Image from "primevue/image";
 import MultiSelect from "primevue/multiselect";
-import InputSwitch from "primevue/inputswitch";
+
 export default {
   setup() {
     const toast = useToast();
@@ -332,7 +383,6 @@ export default {
   components: {
     InputNumber,
     DataTable,
-    ToggleButton,
     MultiSelect,
     Column,
     InputText,
@@ -343,8 +393,6 @@ export default {
     Button,
     Dialog,
     Image,
-    InputSwitch,
-    SelectButton,
   },
   data() {
     return {
@@ -439,6 +487,8 @@ export default {
           data
         );
 
+        console.log(response);
+
         this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
         this.toast.error(
@@ -448,21 +498,12 @@ export default {
       }
     },
 
-    //DESABILITAR PRODUCTOS///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //DESABILITAR PRODDUCTOS///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v///////////////////////////////////////////////////////////////////////////////////////////////////////
     deshabilitarProducto(producto, index) {
-      this.editedProduct = Object.assign({}, producto);
+      console.log(producto + " - " + index);
       this.deshabilitarDialog = true;
-      // this.actualizarProducto(producto);
     },
-    confirmDeshabilitar() {
-      this.editedProduct.EstaActivo = !this.editedProduct.EstaActivo;
-
-      console.log(this.editedProduct);
-      console.log("this.editedProduct");
-      this.actualizarProducto(this.editedProduct);
-      this.deshabilitarDialog = false;
-      this.getProductos();
-    },
+    confirmDeshabilitar() {},
     closeDeshabilitar() {
       this.deshabilitarDialog = false;
     },
@@ -521,30 +562,32 @@ export default {
       }
     },
     guardarProductos(producto) {
-      console.log(producto);
       // Verificar que el objeto de usuario tenga los datos necesarios
-      if (
-        !producto.Nombre ||
-        !producto.Descripcion ||
-        !producto.CantidadStock ||
-        !producto.Precio ||
-        !producto.FotoUrl
-      ) {
-        this.toast.error("Faltan datos del producto.", {
-          timeout: 3000,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          pauseOnHover: false,
-          draggable: true,
-          draggablePercent: 0.6,
-          showCloseButtonOnHover: true,
-          hideProgressBar: true,
-          closeButton: "button",
-          icon: true,
-          rtl: false,
-        });
-        return;
-      }
+      // if (
+      //   !producto.Nombre ||
+      //   !producto.Descripcion ||
+      //   !producto.CantidadStock ||
+      //   !producto.Precio ||
+      //   !producto.FotoUrl
+      //   /* ||
+      //   !producto.EstaActivo == true ||
+      //   !producto.EstaActivo == false */
+      // ) {
+      //   this.toast.error("Faltan datos del producto.", {
+      //     timeout: 3000,
+      //     closeOnClick: true,
+      //     pauseOnFocusLoss: false,
+      //     pauseOnHover: false,
+      //     draggable: true,
+      //     draggablePercent: 0.6,
+      //     showCloseButtonOnHover: true,
+      //     hideProgressBar: true,
+      //     closeButton: "button",
+      //     icon: true,
+      //     rtl: false,
+      //   });
+      //   return;
+      // }
 
       if (this.formTitle === "Agregar producto") {
         producto.Categorias.forEach((categoria) => {
@@ -596,35 +639,6 @@ export default {
         return "En Stock";
       }
     },
-    getEstatus(EstaActivo) {
-      if (EstaActivo == true) {
-        return "success";
-      } else {
-        return "danger";
-      }
-    },
-    getEstatusLabel(EstaActivo) {
-      if (EstaActivo == true) {
-        return "Disponible";
-      } else {
-        return "No Disponible";
-      }
-    },
-    getIcono(EstaActivo) {
-      if (EstaActivo == false) {
-        return "pi pi-eye";
-      } else {
-        return "pi pi-eye-slash";
-      }
-    },
-    getIconoEstatus(EstaActivo) {
-      if (EstaActivo == true) {
-        return "danger";
-      } else {
-        return "success";
-      }
-    },
-
     formatDate(value) {
       value = new Date(value);
       return value.toLocaleDateString("en-US", {
