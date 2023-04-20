@@ -5,6 +5,7 @@ import PagarProducto from "../components/PagarProducto.vue";
 import GestionarStock from "../views/admin/GestionarStock.vue";
 import GestionarUsuarios from "../views/admin/GestionarUsuarios.vue";
 import GestionarRoles from "../views/admin/GestionarRoles.vue";
+import GestionarCategorias from "../views/admin/GestionarCategorias.vue";
 import MiPerfil from "../views/cliente/MiPerfil.vue";
 import MisPedidos from "../views/cliente/MisPedidos.vue";
 import PantallaLogin from "../views/PantallaLogin.vue";
@@ -40,6 +41,14 @@ const routes = [
     path: "/gestionarProductos",
     name: "GestionarStock",
     component: GestionarStock,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/gestionarCategorias",
+    name: "GestionarCategorias",
+    component: GestionarCategorias,
     meta: {
       requiresAuth: true,
     },
