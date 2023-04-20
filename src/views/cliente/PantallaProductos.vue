@@ -89,21 +89,24 @@
         xs="12"
       >
         <v-card class="mx-auto my-2" max-width="auto" elevation="6">
-          <div class="my-4"></div>
-          <v-img
-            v-if="producto.FotoUrl != null"
-            :src="producto.FotoUrl"
-            :alt="producto.FotoUrl"
-            height="200px"
-            contain
-          ></v-img>
-          <v-img
-            v-else
-            src="https://ecomworld.shop/uploads/default-product.png"
-            :alt="producto.Nombre"
-            height="300px"
-            contain
-          ></v-img>
+          <div class="my-4 text-center">
+            <Image
+              preview
+              v-if="producto.FotoUrl != null"
+              :src="producto.FotoUrl"
+              :alt="producto.FotoUrl"
+              class="border-round"
+              height="300"
+            />
+
+            <Image
+              style="width: fit-content"
+              v-else
+              src="https://ecomworld.shop/uploads/default-product.png"
+              :alt="producto.Nombre"
+              class="border-round"
+            ></Image>
+          </div>
           <v-card-title
             style="
               font-family: 'Poppins', sans-serif !important;
@@ -198,16 +201,25 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
 import axios from "axios";
 import api from "../../utilities/api";
 
+import Image from "primevue/image";
 export default {
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
+  components: {
+    Image,
+  },
   data() {
     return {
       checkoutModal: false,
       productosCarrito: [],
       categories: [],
-
+      toastProperties: this.$store.state.defaultToastProperties,
       listaCategorias: [],
       listaProductos: [],
       listaProductoFiltros: [],
@@ -324,18 +336,13 @@ export default {
 
         console.log(response);
 
-        // this.toast.success(response.data.Message, this.toastProperties);
+        this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
         this.toast.error(
           "Error 500. Error al agregar al carrito." + error,
           this.toastProperties
         );
       }
-    },
-
-    agregarNuevoProducto(producto) {
-      this.$store.commit("agregarNuevoProducto", producto);
-      console.log(this.$store.state.productosCarrito);
     },
 
     showPaymentModal() {

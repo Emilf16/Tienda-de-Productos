@@ -404,12 +404,17 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
 import api from "../../utilities/api";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import Dropdown from "primevue/dropdown";
-import axios from "axios";
+// import axios from "axios";
 export default {
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   // props: ['productosCarrito'],
   components: {
     Button,
@@ -423,6 +428,7 @@ export default {
       direccionSeleccionada: {},
       token: localStorage.getItem("token"),
       user: {},
+      toastProperties: this.$store.state.defaultToastProperties,
       userVerification: {},
       listaProductosCarrito: [],
       pagoDialog: false,
@@ -491,9 +497,12 @@ export default {
 
         this.direcciones = response.data;
         console.log(response.data);
-        // this.toast.success(response.data.Message, this.toastProperties);
+        this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al cargar los pedidos.",
+          this.toastProperties
+        );
       }
       console.log(this.tarjetaSeleccionada.idMetodo);
       console.log(this.direccionSeleccionada);
@@ -512,7 +521,10 @@ export default {
         console.log(response.data);
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
       }
     },
 
@@ -528,7 +540,10 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
       }
     },
 
@@ -543,7 +558,10 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
       }
     },
     async agregarOtroProductoCarrito(producto) {
@@ -557,7 +575,10 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
       }
     },
     async borrarProductoCarrito(producto) {
@@ -571,7 +592,10 @@ export default {
 
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        console.error("Error:", error);
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
       }
     },
   },

@@ -67,7 +67,6 @@
 
       <v-divider></v-divider>
       <v-list density="compact" nav>
-        <!-- buscar productos -->
         <router-link to="/" style="text-decoration: none; color: inherit"
           ><v-list-item
             prepend-icon="mdi-view-dashboard"
@@ -75,7 +74,7 @@
             value="productos"
           ></v-list-item
         ></router-link>
-
+ 
         <!-- ver carrito -->
         <router-link
           to="/carritoCompras"
@@ -110,33 +109,27 @@
         ></router-link>
 
         <!-- gestionar Usuario -->
-        <router-link
-          to="/gestionarUsuarios"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-account-edit"
-            title="Gestionar Usuarios"
-            value="usuarios"
-          ></v-list-item
-        ></router-link>
-        <!-- gestionar Roles -->
-        <router-link
-          to="/gestionarRoles"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-account-key"
-            title="Perfiles y Roles"
-            value="roles"
-          ></v-list-item
-        ></router-link>
-        <!-- gestionar Categorias -->
+ 
         <router-link
           to="/gestionarCategorias"
           style="text-decoration: none; color: inherit"
           ><v-list-item
-            prepend-icon="mdi-store"
-            title="Categorías"
-            value="categoria"
+ 
+            prepend-icon="mdi-view-dashboard"
+            title="categ"
+            value="categ" 
+          ></v-list-item
+        ></router-link>
+        <router-link
+          v-for="(vista, index) in vistas"
+          :key="index"
+          :to="vista.URL"
+          style="text-decoration: none; color: inherit"
+          ><v-list-item
+ 
+            prepend-icon="mdi-view-dashboard"
+            :title="vista.Vista"
+            :value="vista.DescVista" 
           ></v-list-item
         ></router-link>
         <!-- gestionar Pedidos -->
@@ -210,8 +203,9 @@ export default {
     return {
       drawer: false,
       rail: true,
+      user: {},
       reveal: false,
-      categories: [],
+      vistas: [],
       socialIcons: [
         { icon: "mdi-facebook", link: "www.facebook.com/mitienda" },
         { icon: "mdi-twitter", link: "www.twitter.com/mitienda" },
@@ -243,7 +237,7 @@ export default {
         console.error("Error:", error);
       }
     },
-    async get() {
+    async getUsuario() {
       try {
         const url = "https://tiendabackend.azurewebsites.net/api/Account";
         const token = localStorage.getItem("token");
@@ -253,12 +247,17 @@ export default {
             Authorization: `${token}`,
           },
         });
+        this.user = response.data;
+        this.vistas = response.data.vistas;
 
         console.log("Success:", response.data);
       } catch (error) {
         console.error("Error:", error);
       }
     },
+  },
+  mounted() {
+    this.getUsuario();
   },
 };
 </script>

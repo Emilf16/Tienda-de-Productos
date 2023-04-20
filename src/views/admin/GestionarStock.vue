@@ -379,6 +379,7 @@ export default {
       },
       loading: true,
       toastProperties: this.$store.state.defaultToastProperties,
+      toastProperties: this.$store.state.defaultToastProperties,
       breadCrumb: [
         {
           title: "Home",
@@ -386,9 +387,9 @@ export default {
           href: "/",
         },
         {
-          title: "Gestionar Stock",
+          title: "Gestionar Productos",
           disabled: true,
-          href: "/gestionarStock",
+          href: "/gestionarProductos",
         },
       ],
       pageLoaded: false,
