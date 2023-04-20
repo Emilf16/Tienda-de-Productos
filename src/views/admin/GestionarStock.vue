@@ -108,11 +108,20 @@
                   </Column>
 
                   <!-- ESTADO ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-                  <Column header="Estado" sortable style="min-width: 12rem">
+                  <Column header="STOCK" sortable style="min-width: 12rem">
                     <template #body="{ data }">
                       <Tag
                         :value="getStockLabel(data.CantidadStock)"
                         :severity="getStock(data.CantidadStock)"
+                      />
+                    </template>
+                  </Column>
+                  <!-- DISPONIBILIDAD ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+                  <Column header="ESTATUS" sortable style="min-width: 12rem">
+                    <template #body="{ data }">
+                      <Tag
+                        :value="getEstatusLabel(data.EstaActivo)"
+                        :severity="getEstatus(data.EstaActivo)"
                       />
                     </template>
                   </Column>
@@ -133,10 +142,10 @@
                         @click="editarProducto(data, index)"
                       />
                       <Button
-                        icon="pi pi-trash"
-                        outlined
+                        :icon="getIcono(data.EstaActivo)"
+                        text
                         rounded
-                        severity="danger"
+                        :severity="getIconoEstatus(data.EstaActivo)"
                         @click="deshabilitarProducto(data, index)"
                       />
                     </template>
@@ -152,7 +161,7 @@
     <!-- DIALOGO PARA EDITAR PRODUCTOS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
     <Dialog
       v-model:visible="productoDialog"
-      :style="{ width: '100vh' }"
+      :style="{ width: '500px' }"
       :modal="true"
       class="p-fluid"
       :header="formTitle"
@@ -210,90 +219,27 @@
         />
       </div>
 
-      <div class="field">
-        <MultiSelect
-          v-model="editedProduct.Categorias"
-          :options="listaCategorias"
-          filter
-          optionLabel="Nombre"
-          placeholder="Categorias"
-          :maxSelectedLabels="3"
-          class="w-full md:w-20rem"
-          display="chip"
-        />
-      </div>
-
-      <!-- <div class="field">
-        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
-        <Dropdown
-          id="inventoryStatus"
-          v-model="product.inventoryStatus"
-          :options="statuses"
-          optionLabel="label"
-          placeholder="Select a Status"
-        >
-          <template #value="slotProps">
-            <div v-if="slotProps.value && slotProps.value.value">
-              <Tag
-                :value="slotProps.value.value"
-                :severity="getStatusLabel(slotProps.value.label)"
-              />
-            </div>
-            <div v-else-if="slotProps.value && !slotProps.value.value">
-              <Tag
-                :value="slotProps.value"
-                :severity="getStatusLabel(slotProps.value)"
-              />
-            </div>
-            <span v-else>
-              {{ slotProps.placeholder }}
-            </span>
-          </template>
-        </Dropdown>
-      </div> -->
-
-      <!-- <div class="field">
-        <label class="mb-3">Category</label>
-        <div class="formgrid grid">
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category1"
-              name="category"
-              value="Accessories"
-              v-model="product.category"
-            />
-            <label for="category1">Accessories</label>
-          </div>
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category2"
-              name="category"
-              value="Clothing"
-              v-model="product.category"
-            />
-            <label for="category2">Clothing</label>
-          </div>
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category3"
-              name="category"
-              value="Electronics"
-              v-model="product.category"
-            />
-            <label for="category3">Electronics</label>
-          </div>
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category4"
-              name="category"
-              value="Fitness"
-              v-model="product.category"
-            />
-            <label for="category4">Fitness</label>
-          </div>
+      <div class="formgrid grid">
+        <div class="field col">
+          <label for="quantity">Disponibilidad</label>
+          <v-col>
+            <InputSwitch v-model="editedProduct.EstaActivo" />
+          </v-col>
         </div>
-      </div> -->
-
+        <div class="field col">
+          <label for="quantity">Categorias</label>
+          <MultiSelect
+            v-model="editedProduct.Categorias"
+            :options="listaCategorias"
+            filter
+            optionLabel="Nombre"
+            placeholder="Categorias"
+            :maxSelectedLabels="3"
+            class="w-full md:w-20rem"
+            display="chip"
+          />
+        </div>
+      </div>
       <div class="formgrid grid">
         <div class="field col">
           <label for="price">Precio</label>
@@ -320,12 +266,14 @@
             label="Cancelar"
             icon="pi pi-times"
             text
+            style="color: white; background-color: red"
             @click="closeEditar()"
           />
           <Button
             label="Guardar"
             icon="pi pi-check"
             text
+            style="color: white; background-color: green"
             @click="guardarProductos(editedProduct)"
           />
         </div>
@@ -337,26 +285,41 @@
       v-model:visible="deshabilitarDialog"
       modal
       header="Deshabilitar Productos"
-      :style="{ width: '50vw' }"
+      :style="{ width: '500px' }"
     >
-      <v-card-title class="text-h5" style="text-align: center"
-        >¿Está seguro que desea eliminar este producto?</v-card-title
-      >
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="#BE1D1D" variant="flat" @click="closeDeshabilitar()">
-          <span style="color: white"> Cancelar </span>
-        </v-btn>
-        <v-btn color="#008F39" variant="flat" @click="confirmDeshabilitar()">
-          <span style="color: white"> Confirmar </span>
-        </v-btn>
-        <v-spacer></v-spacer>
-      </v-card-actions>
+      <div class="field">
+        <span class="text-h5" style="text-align: center"
+          >¿Está seguro que desea eliminar este producto?</span
+        >
+      </div>
+      <template #footer>
+        <div style="height: 40px">
+          <Button
+            type="button"
+            label="Cancelar"
+            icon="pi pi-times"
+            text
+            color="#BE1D1D"
+            style="color: white; background-color: red"
+            @click="closeDeshabilitar()"
+          />
+          <Button
+            type="button"
+            label="Confirmar"
+            icon="pi pi-check"
+            text
+            style="color: white; background-color: green"
+            @click="confirmDeshabilitar()"
+          />
+        </div>
+      </template>
     </Dialog>
   </v-container>
 </template>
 
 <script>
+import SelectButton from "primevue/selectbutton";
+import ToggleButton from "primevue/togglebutton";
 import Chip from "primevue/chip";
 import { useToast } from "vue-toastification";
 import api from "../../utilities/api";
@@ -374,7 +337,7 @@ import InputNumber from "primevue/inputnumber";
 import "primeicons/primeicons.css";
 import Image from "primevue/image";
 import MultiSelect from "primevue/multiselect";
-
+import InputSwitch from "primevue/inputswitch";
 export default {
   setup() {
     const toast = useToast();
@@ -383,6 +346,7 @@ export default {
   components: {
     InputNumber,
     DataTable,
+    ToggleButton,
     MultiSelect,
     Column,
     InputText,
@@ -393,6 +357,8 @@ export default {
     Button,
     Dialog,
     Image,
+    InputSwitch,
+    SelectButton,
   },
   data() {
     return {
@@ -406,7 +372,6 @@ export default {
       deshabilitarDialog: false,
       editedProduct: {},
       categoriasSeleccionadas: [],
-
       defaultProduct: {},
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -430,7 +395,6 @@ export default {
       token: localStorage.getItem("token"),
       user: {},
       expandedRows: [],
-
       detailsVisible: false,
     };
   },
@@ -440,7 +404,6 @@ export default {
         .get("Account")
         .then((data) => {
           this.user = data.data.usuario;
-
           this.getProductos();
           this.getCategorias();
           this.pageLoaded = true;
@@ -459,7 +422,6 @@ export default {
         const response = await api.get(
           "https://tiendabackend.azurewebsites.net/api/Productos/GetCategorias"
         );
-
         this.listaCategorias = response.data;
         console.log(response.data);
       } catch (error) {
@@ -471,14 +433,12 @@ export default {
         const response = await api.get(
           "https://tiendabackend.azurewebsites.net/api/Productos/GetAllProducts"
         );
-
         this.listaProductos = response.data;
         this.loading = false;
       } catch (error) {
         console.error("Error:", error);
       }
     },
-
     async crearProductos() {
       try {
         const data = this.defaultProduct;
@@ -486,9 +446,6 @@ export default {
           "https://tiendabackend.azurewebsites.net/api/Productos",
           data
         );
-
-        console.log(response);
-
         this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
         this.toast.error(
@@ -497,17 +454,23 @@ export default {
         );
       }
     },
-
-    //DESABILITAR PRODDUCTOS///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //DESABILITAR PRODUCTOS///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v///////////////////////////////////////////////////////////////////////////////////////////////////////
     deshabilitarProducto(producto, index) {
-      console.log(producto + " - " + index);
+      this.editedProduct = Object.assign({}, producto);
       this.deshabilitarDialog = true;
+      // this.actualizarProducto(producto);
     },
-    confirmDeshabilitar() {},
+    confirmDeshabilitar() {
+      this.editedProduct.EstaActivo = !this.editedProduct.EstaActivo;
+      console.log(this.editedProduct);
+      console.log("this.editedProduct");
+      this.actualizarProducto(this.editedProduct);
+      this.deshabilitarDialog = false;
+      this.getProductos();
+    },
     closeDeshabilitar() {
       this.deshabilitarDialog = false;
     },
-
     //EDITAR PRODDUCTOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     editarProducto(producto, index) {
       this.formTitle = "Editar producto";
@@ -525,7 +488,7 @@ export default {
             this.editedProduct.idProducto,
           data
         );
-
+        this.getProductos();
         this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
         this.toast.error(
@@ -537,7 +500,6 @@ export default {
     closeEditar() {
       this.productoDialog = false;
     },
-
     //AGREGAR PRODDUCTOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     agregarProducto() {
       this.formTitle = "Agregar producto";
@@ -546,13 +508,12 @@ export default {
     },
     async crearProducto(producto) {
       try {
-        console.log(producto);
         const data = producto;
         const response = await api.post(
           "https://tiendabackend.azurewebsites.net/api/Productos",
           data
         );
-
+        this.getProductos();
         this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
         this.toast.error(
@@ -562,39 +523,35 @@ export default {
       }
     },
     guardarProductos(producto) {
+      console.log(producto);
       // Verificar que el objeto de usuario tenga los datos necesarios
-      // if (
-      //   !producto.Nombre ||
-      //   !producto.Descripcion ||
-      //   !producto.CantidadStock ||
-      //   !producto.Precio ||
-      //   !producto.FotoUrl
-      //   /* ||
-      //   !producto.EstaActivo == true ||
-      //   !producto.EstaActivo == false */
-      // ) {
-      //   this.toast.error("Faltan datos del producto.", {
-      //     timeout: 3000,
-      //     closeOnClick: true,
-      //     pauseOnFocusLoss: false,
-      //     pauseOnHover: false,
-      //     draggable: true,
-      //     draggablePercent: 0.6,
-      //     showCloseButtonOnHover: true,
-      //     hideProgressBar: true,
-      //     closeButton: "button",
-      //     icon: true,
-      //     rtl: false,
-      //   });
-      //   return;
-      // }
-
+      if (
+        !producto.Nombre ||
+        !producto.Descripcion ||
+        !producto.CantidadStock ||
+        !producto.Precio ||
+        !producto.FotoUrl
+      ) {
+        this.toast.error("Faltan datos del producto.", {
+          timeout: 3000,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          pauseOnHover: false,
+          draggable: true,
+          draggablePercent: 0.6,
+          showCloseButtonOnHover: true,
+          hideProgressBar: true,
+          closeButton: "button",
+          icon: true,
+          rtl: false,
+        });
+        return;
+      }
       if (this.formTitle === "Agregar producto") {
         producto.Categorias.forEach((categoria) => {
           categoria.PoseeCategoria = true;
         });
         this.crearProducto(producto);
-
         console.log("Nuevo usuario agregado:", producto);
       } else {
         const index = this.listaProductos.findIndex(
@@ -606,15 +563,12 @@ export default {
           producto.Categorias.forEach((categoria) => {
             categoria.PoseeCategoria = true;
           });
-
           this.actualizarProducto(producto);
-
           console.log("Usuario actualizado:", producto);
         }
       }
       this.productoDialog = false;
     },
-
     //FUNCIONES ADICIONALES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     getStock(cantidad) {
       if (cantidad >= 50) {
@@ -627,7 +581,6 @@ export default {
         return "success";
       }
     },
-
     getStockLabel(cantidad) {
       if (cantidad > 20) {
         return "En Stock";
@@ -637,6 +590,34 @@ export default {
         return "Sin Stock";
       } else {
         return "En Stock";
+      }
+    },
+    getEstatus(EstaActivo) {
+      if (EstaActivo == true) {
+        return "success";
+      } else {
+        return "danger";
+      }
+    },
+    getEstatusLabel(EstaActivo) {
+      if (EstaActivo == true) {
+        return "Disponible";
+      } else {
+        return "No Disponible";
+      }
+    },
+    getIcono(EstaActivo) {
+      if (EstaActivo == false) {
+        return "pi pi-eye";
+      } else {
+        return "pi pi-eye-slash";
+      }
+    },
+    getIconoEstatus(EstaActivo) {
+      if (EstaActivo == true) {
+        return "danger";
+      } else {
+        return "success";
       }
     },
     formatDate(value) {
@@ -667,11 +648,9 @@ export default {
     },
   },
   computed: {},
-
   watch: {
     validarToken() {
       const token = localStorage.getItem("token");
-
       this.$store.commit("mostrarTienda", token);
       console.log(this.$store.state.estaLogueado);
     },
@@ -683,7 +662,6 @@ export default {
 </script>
 <style>
 @import "primeicons/primeicons.css";
-
 body {
   background-color: #f3f3f3;
 }
@@ -707,7 +685,6 @@ body {
   font-size: 150% !important;
   margin: 10px 5px 15px 5px;
 }
-
 .pi {
   font-family: PrimeIcons !important;
 }
