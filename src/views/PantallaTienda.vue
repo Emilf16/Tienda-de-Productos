@@ -3,7 +3,7 @@
     <v-app-bar style="background-color: #090c29; color: white">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <router-link to="/" style="text-decoration: none; color: inherit"
-        ><v-toolbar-title>Tienda</v-toolbar-title></router-link
+        ><v-toolbar-title>Secure Store</v-toolbar-title></router-link
       >
       <v-spacer> </v-spacer>
       <v-btn :ripple="false" variant="text" class="text-none" stacked>
