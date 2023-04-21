@@ -566,7 +566,14 @@ export default {
     formatNumber(num) {
       return parseFloat(num).toFixed(2);
     },
-
+    calcularMonto() {
+      this.montoTotal = 0;
+      for (let i = 0; i <= this.listaProductosCarrito.Productos.length; i++) {
+        this.montoTotal +=
+          this.listaProductosCarrito.Productos[i].Precio *
+          this.listaProductosCarrito.Productos[i].CantidadEnCarrito;
+      }
+    },
     async cargarCarrito() {
       try {
         const response = await api.get(
@@ -575,17 +582,15 @@ export default {
 
         console.log(response.data);
         this.listaProductosCarrito = response.data;
-        for (let i = 0; i < this.listaProductosCarrito.Productos.length; i++) {
-          this.montoTotal +=
-            this.listaProductosCarrito.Productos[i].Precio *
-            this.listaProductosCarrito.Productos[i].CantidadEnCarrito;
-        }
+
+        this.calcularMonto();
+
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
-        this.toast.error(
-          "Error 500. Error al agregar al carrito." + error,
-          this.toastProperties
-        );
+        // this.toast.error(
+        //   "Error 500. Error al agregar al carrito." + error,
+        //   this.toastProperties
+        // );
       }
     },
     async agregarOtroProductoCarrito(producto) {
@@ -593,7 +598,7 @@ export default {
         const response = await api.post(
           `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${
             producto.idProducto
-          }&cantidad=${1}&precioPorProducto=${producto.Precio}`
+          }&cantidad=${1}&precioPorProducto=0`
         );
         this.cargarCarrito();
 

@@ -179,11 +179,8 @@
           <!-- HACER QUE SI QUEDAN MENOS DE 5 PRODUCTOS SALGA MENSAJE ROJO AVISANDO -->
 
           <v-card-actions class="d-flex" style="justify-content: space-between">
-            <v-btn color="#090C29" variant="flat" text class="flex-grow-1 ml-2">
-              <span style="color: white; font-weight: bold">Ver</span>
-            </v-btn>
-            <v-spacer></v-spacer>
             <v-btn
+              width="415px"
               color="warning"
               variant="flat"
               class="flex-grow-4 mr-2"
@@ -254,19 +251,19 @@ export default {
         },
         {
           title: "Tecnología",
-          description: "Vestido de versdfde color rojo.",
+          description: "Los mejores accesorios tecnologicos.",
           image:
             "https://cdn.stocksnap.io/img-thumbs/960w/computer-keyboard_IHIHTFK8YH.jpg",
         },
         {
           title: "Hogar",
-          description: "Vsdfo.",
+          description: "Productos para usted y su familia.",
           image:
             "https://cdn.stocksnap.io/img-thumbs/960w/bed-bedroom_UJCTKDCTXC.jpg",
         },
         {
           title: "Libros",
-          description: "Vestido de sdf rojo.",
+          description: "Lo mejor en más leidos del país.",
           image:
             "https://cdn.stocksnap.io/img-thumbs/960w/developer-books_KAUFJW1PEQ.jpg",
         },
@@ -328,20 +325,27 @@ export default {
     },
 
     async agregarAlCarrito(produto) {
-      console.log(produto);
-      try {
-        const response = await api.post(
-          `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${produto.idProducto}&cantidad=1&precioPorProducto=0`
-        );
-
-        console.log(response);
-
-        this.toast.success(response.data.Message, this.toastProperties);
-      } catch (error) {
+      console.log(produto.CantidadStock);
+      if (produto.CantidadStock == 0) {
         this.toast.error(
-          "Error 500. Error al agregar al carrito." + error,
+          "Este producto no está disponible",
           this.toastProperties
         );
+      } else {
+        try {
+          const response = await api.post(
+            `https://tiendabackend.azurewebsites.net/api/Carritos/InsertarProducto?idProducto=${produto.idProducto}&cantidad=1&precioPorProducto=0`
+          );
+
+          console.log(response);
+
+          this.toast.success(response.data.Message, this.toastProperties);
+        } catch (error) {
+          this.toast.error(
+            "Error 500. Error al agregar al carrito." + error,
+            this.toastProperties
+          );
+        }
       }
     },
 
