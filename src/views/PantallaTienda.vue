@@ -11,7 +11,7 @@
           to="/carritoCompras"
           style="text-decoration: none; color: inherit"
         >
-          <v-badge :content="0">
+          <v-badge :content="badge">
             <v-icon size="large" icon="mdi-cart-outline"></v-icon>
           </v-badge>
         </router-link>
@@ -74,72 +74,16 @@
             value="productos"
           ></v-list-item
         ></router-link>
- 
-        <!-- ver carrito -->
-        <router-link
-          to="/carritoCompras"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-cart-outline"
-            title="Carrito"
-            value="carrito"
-          ></v-list-item
-        ></router-link>
 
-        <!-- Categorias -->
-        <router-link
-          to="/pantallaCategorias"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-shopping"
-            title="Categorias"
-            value="categoria"
-          ></v-list-item
-        ></router-link>
-
-        <!-- gestionar productos -->
-        <router-link
-          to="/gestionarStock"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-cart-arrow-down"
-            title="Inventario"
-            value="stock"
-          ></v-list-item
-        ></router-link>
-
-        <!-- gestionar Usuario -->
- 
-        <router-link
-          to="/gestionarCategorias"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
- 
-            prepend-icon="mdi-view-dashboard"
-            title="categ"
-            value="categ" 
-          ></v-list-item
-        ></router-link>
         <router-link
           v-for="(vista, index) in vistas"
           :key="index"
           :to="vista.URL"
           style="text-decoration: none; color: inherit"
           ><v-list-item
- 
-            prepend-icon="mdi-view-dashboard"
+            :prepend-icon="vista.Icon"
             :title="vista.Vista"
-            :value="vista.DescVista" 
-          ></v-list-item
-        ></router-link>
-        <!-- gestionar Pedidos -->
-        <router-link
-          to="/gestionarPedidos"
-          style="text-decoration: none; color: inherit"
-          ><v-list-item
-            prepend-icon="mdi-package-variant"
-            title="Pedidos"
-            value="gestionPedidos"
+            :value="vista.DescVista"
           ></v-list-item
         ></router-link>
       </v-list>
@@ -197,15 +141,25 @@
 
 <script>
 import axios from "axios";
+import { useToast } from "vue-toastification";
+
+import api from "../utilities/api";
 
 export default {
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       drawer: false,
+      listaProductosCarrito: [],
+      badge: 0,
       rail: true,
       user: {},
       reveal: false,
       vistas: [],
+      toastProperties: this.$store.state.defaultToastProperties,
       socialIcons: [
         { icon: "mdi-facebook", link: "www.facebook.com/mitienda" },
         { icon: "mdi-twitter", link: "www.twitter.com/mitienda" },
@@ -255,9 +209,30 @@ export default {
         console.error("Error:", error);
       }
     },
+    async cargarCarrito() {
+      try {
+        const response = await api.get(
+          `https://tiendabackend.azurewebsites.net/api/Carritos/GetActualCarrito`
+        );
+
+        console.log(response.data);
+        this.listaProductosCarrito = response.data;
+        this.badge = this.listaProductosCarrito.Productos.length;
+
+        console.log(this.listaProductosCarrito.Productos.length);
+
+        // this.toast.success(response.data.Message, this.toastProperties);
+      } catch (error) {
+        this.toast.error(
+          "Error 500. Error al agregar al carrito." + error,
+          this.toastProperties
+        );
+      }
+    },
   },
   mounted() {
     this.getUsuario();
+    this.cargarCarrito();
   },
 };
 </script>
