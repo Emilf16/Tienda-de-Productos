@@ -29,7 +29,7 @@
                   top: -25px;
                   bottom: 5;
                   margin-bottom: 10px;
-                  width: 55%;
+                  width: 40%;
                   text-align: right;
                   padding-right: -30%;
                 "
@@ -42,7 +42,7 @@
                   top: -25px;
                   bottom: 5;
                   margin-bottom: 10px;
-                  width: 72%;
+                  width: 55%;
                   text-align: right;
                   padding-right: -30%;
                 "
@@ -55,7 +55,7 @@
                   top: -25px;
                   bottom: 5;
                   margin-bottom: 10px;
-                  width: 85%;
+                  width: 65%;
                   text-align: right;
                   padding-right: -30%;
                 "
@@ -112,7 +112,7 @@
                           top: 47px;
                           bottom: 3;
                           margin-bottom: 7px;
-                          width: 53%;
+                          width: 40%;
                           text-align: right;
                           padding-right: -30%;
                         "
@@ -128,7 +128,7 @@
                           top: 47px;
                           bottom: 3;
                           margin-bottom: 1px;
-                          width: 66%;
+                          width: 50%;
                           text-align: right;
                           padding-right: -30%;
                         "
@@ -139,6 +139,24 @@
                           >{{ producto.CantidadEnCarrito }}</span
                         >
                       </div>
+                      <div
+                        style="
+                          position: absolute;
+                          left: 0;
+                          top: 47px;
+                          bottom: 3;
+                          margin-bottom: 1px;
+                          width: 60%;
+                          text-align: right;
+                          padding-right: -30%;
+                        "
+                      >
+                        <span
+                          style="font-size: large"
+                          class="text-black mt-1"
+                          >{{ preciototal(producto) }}</span
+                        >
+                      </div>
 
                       <div
                         style="
@@ -146,43 +164,34 @@
                           left: 0;
                           top: 32px;
                           bottom: 5;
-                          margin-bottom: 10px;
-                          width: 100%;
+                          margin-bottom: 30px;
+                          width: 80%;
                           text-align: right;
-                          padding-right: -30%;
                         "
                       >
-                        <v-btn
-                          @click="borrarProductoCarrito(producto)"
-                          icon
-                          elevation="0"
-                          hover-size="0"
-                        >
-                          <v-icon left color="#252525">mdi-delete</v-icon>
-                        </v-btn>
-                      </div>
-                      <div
-                        style="
-                          position: absolute;
-                          left: 0;
-                          top: 32px;
-                          bottom: 5;
-                          margin-bottom: 10px;
-                          width: 95%;
-                          text-align: right;
-                          padding-right: -30%;
-                        "
-                      >
-                        <v-btn
-                          icon
-                          elevation="0"
-                          hover-size="0"
-                          @click="agregarOtroProductoCarrito(producto)"
-                        >
-                          <span style="color: #252525; font-weight: bold">
-                            +
-                          </span>
-                        </v-btn>
+                        <v-col>
+                          <v-btn
+                            icon
+                            elevation="0"
+                            hover-size="0"
+                            @click="agregarOtroProductoCarrito(producto)"
+                          >
+                            Agregar
+                            <span style="color: #252525; font-weight: bold">
+                              +
+                            </span>
+                          </v-btn>
+                          <div style="width: 30px"></div>
+                          <v-btn
+                            @click="borrarProductoCarrito(producto)"
+                            icon
+                            elevation="0"
+                            hover-size="0"
+                          >
+                            Eliminar
+                            <v-icon left color="#252525">mdi-delete</v-icon>
+                          </v-btn>
+                        </v-col>
                       </div>
                     </v-row>
                   </v-card-text>
@@ -218,7 +227,9 @@
                 style="display: flex; justify-content: space-between"
               >
                 <span>Total Productos:</span>
-                <span style="text-align: right">100.00</span>
+                <span style="text-align: right">{{
+                  formatNumber(montoTotal)
+                }}</span>
               </div>
               <br />
               <div
@@ -235,11 +246,13 @@
               style="
                 display: flex;
                 justify-content: space-between;
-                font-weight: bold;
+                font-weight: bold;,
               "
             >
               <span>Total:</span>
-              <span style="text-align: right">100.00</span>
+              <span style="text-align: right">{{
+                formatNumber(montoTotal)
+              }}</span>
             </div>
           </v-card-title>
           <v-card-text> </v-card-text>
@@ -446,6 +459,7 @@ export default {
         expirationDate: true,
         cvv: true,
       },
+      montoTotal: 0,
       nameRules: [
         (v) => !!v || "El nombre en la tarjeta es requerido",
         (v) => /^[a-zA-Z\s]*$/.test(v) || "Solo se permiten letras y espacios",
@@ -470,6 +484,9 @@ export default {
   methods: {
     limpiarCarrito() {
       this.listaProductosCarrito = [];
+    },
+    preciototal(producto) {
+      return producto.CantidadEnCarrito * producto.Precio;
     },
 
     mostrarPagoDialog() {
@@ -546,6 +563,9 @@ export default {
         );
       }
     },
+    formatNumber(num) {
+      return parseFloat(num).toFixed(2);
+    },
 
     async cargarCarrito() {
       try {
@@ -555,7 +575,11 @@ export default {
 
         console.log(response.data);
         this.listaProductosCarrito = response.data;
-
+        for (let i = 0; i < this.listaProductosCarrito.Productos.length; i++) {
+          this.montoTotal +=
+            this.listaProductosCarrito.Productos[i].Precio *
+            this.listaProductosCarrito.Productos[i].CantidadEnCarrito;
+        }
         // this.toast.success(response.data.Message, this.toastProperties);
       } catch (error) {
         this.toast.error(
@@ -599,6 +623,7 @@ export default {
       }
     },
   },
+
   mounted() {
     this.cargarCarrito();
     this.cargarDirecciones();
