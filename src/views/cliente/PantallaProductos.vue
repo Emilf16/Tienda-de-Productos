@@ -254,19 +254,19 @@ export default {
         },
         {
           title: "Tecnología",
-          description: "Vestido de versdfde color rojo.",
+          description: "Los mejores accesorios tecnologicos.",
           image:
             "https://cdn.stocksnap.io/img-thumbs/960w/computer-keyboard_IHIHTFK8YH.jpg",
         },
         {
           title: "Hogar",
-          description: "Vsdfo.",
+          description: "Productos para usted y su familia.",
           image:
             "https://cdn.stocksnap.io/img-thumbs/960w/bed-bedroom_UJCTKDCTXC.jpg",
         },
         {
           title: "Libros",
-          description: "Vestido de sdf rojo.",
+          description: "Lo mejor en más leidos del país.",
           image:
             "https://cdn.stocksnap.io/img-thumbs/960w/developer-books_KAUFJW1PEQ.jpg",
         },
